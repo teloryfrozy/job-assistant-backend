@@ -10,10 +10,10 @@ git clone -b branchName https://your_pseudo:token@github.com/Zapony/JobAssistant
 
 pip install -r backend/requirements.txt
 
-#Grant execution permissions and start servers
+#Grant execution permissions and start backend
 
-chmod +x start_servers.sh
-sudo ./start_servers.sh
+chmod +x start_backend.sh
+sudo ./start_backend.sh
 
 
 ### Stopping the Backend Server:
