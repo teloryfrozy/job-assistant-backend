@@ -15,6 +15,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 CUSTOM_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 SECRET_KEY = DJANGO_SECRET_KEY
 BACKEND_LOG_PATH = "backend.log"
+BACKEND_JSON_LOG = "logger.json"
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
@@ -52,7 +53,6 @@ SIMPLE_JWT = {
     "LEEWAY": 0,
 }
 
-
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -64,9 +64,9 @@ LOGGING = {
         },
         "file": {
             "class": "logging.FileHandler",
-            "filename": BACKEND_LOG_PATH,
-            "level": "INFO",
-            "formatter": "verbose",
+            "filename": BACKEND_JSON_LOG,
+            "level": "ERROR",
+            "formatter": "json",
         },
     },
     "loggers": {
@@ -84,10 +84,9 @@ LOGGING = {
             "format": "{levelname} - {message}",
             "style": "{",
         },
-        "verbose": {
-            "format": "{asctime} | {name}.py | Line {lineno} | {levelname} - {message}",
-            "style": "{",
-            "datefmt": CUSTOM_DATE_FORMAT,
+        "json": {
+            "format": "%(asctime)s | %(name)s.py | Line %(lineno)d | %(levelname)s - %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
         },
     },
 }

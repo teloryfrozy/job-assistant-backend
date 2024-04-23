@@ -10,7 +10,6 @@ ABS_PATH=$(pwd)
 source "$ABS_PATH/py_env/bin/activate"
 
 # Run backend setup commands
-ls
 cd backend
 python3 manage.py makemigrations
 python3 manage.py migrate
