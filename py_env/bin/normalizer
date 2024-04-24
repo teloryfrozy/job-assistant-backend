@@ -1,4 +1,4 @@
-#!/home/arolet/JobAssistant/py_env/bin/python3
+#!/Users/flavianirere/Desktop/workspace/JobAssistant/JobAssistant/py_env/bin/python3.12
 # -*- coding: utf-8 -*-
 import re
 import sys

@@ -14,6 +14,7 @@ from job_assistant.constants import DJANGO_SECRET_KEY
 BASE_DIR = Path(__file__).resolve().parent.parent
 CUSTOM_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 SECRET_KEY = DJANGO_SECRET_KEY
+print(SECRET_KEY)
 BACKEND_LOG_PATH = "backend.log"
 BACKEND_JSON_LOG = "logger.json"
 
@@ -28,7 +29,7 @@ USE_TZ = True
 
 ######################## SECURITY ########################
 DEBUG = True
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["127.0.0.1"]
 CORS_ALLOW_ALL_ORIGINS = False
 
 # Database
