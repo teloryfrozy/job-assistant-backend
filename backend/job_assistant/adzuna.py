@@ -5,7 +5,9 @@ The clarity of the code will be improved later on. For now just write request.
 We will figure out how to organize it properly on time.
 """
 
+import datetime
 import json
+import os
 import logging
 from urllib.parse import urlencode
 import requests
@@ -17,29 +19,83 @@ LOGGER = logging.getLogger(__name__)
 
 class Request:
 
+
     @staticmethod
-    def get_avg_salary(job: str, skills: list) -> int:
+    def set_avg_salary(job: str, skills: list):
         """Returns average salary according to skills"""
 
-        url = f"{ADZUNA_API}jobs/gb/jobsworth?"
-        url += urlencode(
-            {
-                "app_id": ADZUNA_APP_ID,
-                "app_key": ADZUNA_SECRET_KEY,
-                "title": job,
-                "description": ",".join(skills),
-                "content-type": "application/json",
-            }
-        )
+        file = f"backend/data_stats/avg_salaries.json"
 
-        response = requests.get(url)
-        if response.status_code == 200:
-            data = response.json()
-            salary = data["salary"]
-            return salary
+        
+        def get_avg_salary_country(country:str) -> int:
+            url = f"{ADZUNA_API}jobs/{country}/jobsworth?"
+            url += urlencode(
+                {
+                    "app_id": ADZUNA_APP_ID,
+                    "app_key": ADZUNA_SECRET_KEY,
+                    "title": job,
+                    "description": ",".join(skills),
+                    "content-type": "application/json",
+                }
+            )
+
+            response = requests.get(url)
+            if response.status_code == 200:
+                data = response.json()
+                salary:int = data["salary"]
+                return salary
+            else:
+                LOGGER.error(f"{response.reason}, {response.status_code}")
+                return None
+
+        
+
+        # with the nb of ads in a category, the current date
+        # the avg salary (anual) => run Request.get_avg_salary
+        # other stats (standard deviation, kurtosis, skewniss, etc)
+        # also do this for the main countries (fr, gb, us, de)
+
+        countries:list = ["fr", "gb", "us", "de"]
+        average = 0
+        nb_success = 0
+        date = datetime.datetime.now().strftime("%Y-%m-%d")
+        record = {
+            "date":date
+        }
+
+        for country in countries:
+            result = get_avg_salary_country(country)
+            if result:
+                nb_success += 1
+                average += result
+                record[country] = result
+                print(f"Adding average for {country}: {result}")
+                print(record)
+        
+        average = int(average/nb_success)
+        record["avg"] = average
+
+        print("Just added the total avg")
+        print(record)
+
+        if os.path.exists(file):
+            with open(file) as f:
+                data = json.load(f)
+
+            data.append(record)
+
+            with open(file, mode="w") as f:
+                json.dump(data, f, indent=4)
         else:
-            LOGGER.error(f"{response.reason}, {response.status_code}")
-            return None
+            with open(file, mode="w") as f:
+                json.dump([record], f, indent=4)
+        
+        
+
+
+
+
+        
 
     def get_params(params: dict) -> dict:
         params.update(
@@ -71,6 +127,23 @@ class Request:
         return data
 
 
+
+
+
+
+
+
+
+# TODO: create a representative list of skills for typical jobs
+# such as developers, software engineer, network administrator, cyber expert, Data Analyst
+Request.set_avg_salary("Software Engineer", ["Django, CSS, JavaScript"])
+
+
+
+
+
+
+"""
 results = Request.get_jobs(
     country="gb",
     params={
@@ -85,6 +158,8 @@ results = Request.get_jobs(
     },
     nb_pages=2,
 )
+"""
+
 
 
 # for json_data in results:
@@ -92,31 +167,6 @@ results = Request.get_jobs(
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-print(Request.get_avg_salary("Software Engineer", ["Django"]))
-
-
-# TODO: Analyse data output and store a json file
-
-# Create a function that requires skills, job title
-# it must return the following
-
-# with the nb of ads in a category, the current date
-# the avg salary (anual) => run Request.get_avg_salary
-# other stats (standard deviation, kurtosis, skewniss, etc)
-# also do this for the main countries (fr, gb, us, de)
 
 
 """response = Request.get_jobs(
