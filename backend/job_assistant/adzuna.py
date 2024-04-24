@@ -10,73 +10,79 @@ import json
 import os
 import logging
 from urllib.parse import urlencode
+import numpy as np
+from scipy import stats
 import requests
 from constants import ADZUNA_API, ADZUNA_APP_ID, ADZUNA_SECRET_KEY
 
 
+######################## LOGGING CONFIGURATION ########################
 LOGGER = logging.getLogger(__name__)
 
 
-class Request:
+class Adzuna:
 
+    def __init__(self) -> None:
+        pass
 
-    @staticmethod
-    def set_avg_salary(job: str, skills: list):
+    def get_params(self, params: dict) -> dict:
+        params.update(
+            {
+                "app_id": ADZUNA_APP_ID,
+                "app_key": ADZUNA_SECRET_KEY,
+                "content-type": "application/json",
+            }
+        )
+        return params
+
+    def set_avg_salary(self, job: str, skills: list):
         """Returns average salary according to skills"""
 
         file = f"backend/data_stats/avg_salaries.json"
 
-        
-        def get_avg_salary_country(country:str) -> int:
-            url = f"{ADZUNA_API}jobs/{country}/jobsworth?"
-            url += urlencode(
-                {
-                    "app_id": ADZUNA_APP_ID,
-                    "app_key": ADZUNA_SECRET_KEY,
-                    "title": job,
-                    "description": ",".join(skills),
-                    "content-type": "application/json",
-                }
-            )
+        def get_avg_salary_country(country: str) -> int:
+            """TODO: doc of the function."""
 
-            response = requests.get(url)
+            url = f"{ADZUNA_API}jobs/{country}/jobsworth?"
+            params = self.get_params({"title": job, "description": ",".join(skills)})
+
+            response = requests.get(url, params=params)
             if response.status_code == 200:
                 data = response.json()
-                salary:int = data["salary"]
+                salary: int = data["salary"]
                 return salary
             else:
                 LOGGER.error(f"{response.reason}, {response.status_code}")
                 return None
 
-        
+        # TODO: store other useful stats
+        # other stats that I forgot: mean, min, max
+        # also do this for the main countries (gb, us)
 
-        # with the nb of ads in a category, the current date
-        # the avg salary (anual) => run Request.get_avg_salary
-        # other stats (standard deviation, kurtosis, skewniss, etc)
-        # also do this for the main countries (fr, gb, us, de)
+        # also add a doc somewhere to understand what kurtosis and skew means
+        # aka: big value = what, small val = what?
+        # add on Notion to create an algorithm (later with ML) to interpret these stats values
 
-        countries:list = ["fr", "gb", "us", "de"]
+        countries: list = ["gb", "us"]
+        all_salaries = []
         average = 0
         nb_success = 0
         date = datetime.datetime.now().strftime("%Y-%m-%d")
-        record = {
-            "date":date
-        }
+        record = {"date": date}
 
         for country in countries:
             result = get_avg_salary_country(country)
             if result:
                 nb_success += 1
                 average += result
+                all_salaries.append(result)
                 record[country] = result
-                print(f"Adding average for {country}: {result}")
-                print(record)
-        
-        average = int(average/nb_success)
-        record["avg"] = average
 
-        print("Just added the total avg")
-        print(record)
+        record["std_dev"] = int(np.std(all_salaries))
+        record["kurtosis"] = float(stats.kurtosis(all_salaries))
+        record["skewness"] = float(stats.skew(all_salaries))
+        average = int(average / nb_success)
+        record["avg"] = average
 
         if os.path.exists(file):
             with open(file) as f:
@@ -89,29 +95,12 @@ class Request:
         else:
             with open(file, mode="w") as f:
                 json.dump([record], f, indent=4)
-        
-        
-
-
-
-
-        
-
-    def get_params(params: dict) -> dict:
-        params.update(
-            {
-                "app_id": ADZUNA_APP_ID,
-                "app_key": ADZUNA_SECRET_KEY,
-                "content-type": "application/json",
-            }
-        )
-        return params
 
     @staticmethod
     def get_jobs(country: str, params: dict, nb_pages: int = 20) -> list:
         """Fetches jobs data from the Adzuna API."""
 
-        params = Request.get_params(params)
+        params = Adzuna().get_params(params)
         data = []
 
         for i in range(1, nb_pages + 1):
@@ -127,22 +116,25 @@ class Request:
         return data
 
 
-
-
-
-
-
-
-
 # TODO: create a representative list of skills for typical jobs
 # such as developers, software engineer, network administrator, cyber expert, Data Analyst
-Request.set_avg_salary("Software Engineer", ["Django, CSS, JavaScript"])
+# Create a schedule task with "pip install django-crontab" => check doc
+
+# TODO: change the name of this function as it's not only the average: maybe set_infos or set_stats (better)
+Adzuna().set_avg_salary(
+    "Full Stack Developer", ["Django, React, Spring, PostgreSQL, Python, Javascript"]
+)
 
 
 
 
 
 
+
+
+
+
+# IGNORE THIS FOR NOW
 """
 results = Request.get_jobs(
     country="gb",
@@ -161,12 +153,8 @@ results = Request.get_jobs(
 """
 
 
-
 # for json_data in results:
 #     print(json.dumps(json_data, indent=4))
-
-
-
 
 
 """response = Request.get_jobs(
