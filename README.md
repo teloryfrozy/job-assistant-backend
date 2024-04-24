@@ -8,9 +8,9 @@
 # replace branchName by branch you want to clone (e.g: main)
 git clone -b branchName https://your_pseudo:token@github.com/Zapony/JobAssistant
 
-pip install -r backend/requirements.txt
+pip install -r requirements.txt
 
-#Grant execution permissions and start backend
+# Grant execution permissions and start backend
 
 chmod +x start_backend.sh
 sudo ./start_backend.sh

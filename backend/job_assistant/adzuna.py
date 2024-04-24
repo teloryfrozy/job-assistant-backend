@@ -15,11 +15,6 @@ from constants import ADZUNA_API, ADZUNA_APP_ID, ADZUNA_SECRET_KEY
 LOGGER = logging.getLogger(__name__)
 
 
-"""
-http://api.adzuna.com:80/v1/api/jobs/gb/search/1?app_id={YOUR_APP_ID}&app_key={YOUR_APP_KEY}&results_per_page=20&what=javascript%20developer&what_exclude=java&where=london&sort_by=salary&salary_min=30000&full_time=1&permanent=1&content-type=application/json
-"""
-
-
 class Request:
 
     @staticmethod
@@ -46,41 +41,110 @@ class Request:
             LOGGER.error(f"{response.reason}, {response.status_code}")
             return None
 
+    def get_params(params: dict) -> dict:
+        params.update(
+            {
+                "app_id": ADZUNA_APP_ID,
+                "app_key": ADZUNA_SECRET_KEY,
+                "content-type": "application/json",
+            }
+        )
+        return params
+
     @staticmethod
-    def get_jobs(query: str) -> requests.Response:
+    def get_jobs(country: str, params: dict, nb_pages: int = 20) -> list:
         """Fetches jobs data from the Adzuna API."""
 
-        url = f"{ADZUNA_API}{query}"
-        params = {
-            "app_id": ADZUNA_APP_ID,
-            "app_key": ADZUNA_SECRET_KEY,
-            "content-type": "application/json",
-        }
+        params = Request.get_params(params)
+        data = []
 
-        response = requests.get(url, params=params)
+        for i in range(1, nb_pages + 1):
+            url = f"{ADZUNA_API}jobs/{country}/search/{i}?"
+            response = requests.get(url, params=params)
 
-        if response.status_code == 200:
-            return response
-        else:
-            LOGGER.error(f"{response.reason}, {response.status_code}")
-            return None
+            if response.status_code == 200:
+                data.append(response.json())
+            else:
+                LOGGER.error(f"{response.reason}, {response.status_code}")
+                return data
 
-
-# response = Request.get_jobs("jobs/gb/search/1")
-# json_data = response.json()
+        return data
 
 
-# # print(json.dumps(json_data, indent=4))
+results = Request.get_jobs(
+    country="gb",
+    params={
+        "results_per_page": 20,
+        "what": "javascript developer",
+        "what_exclude": "java",
+        "where": "london",
+        "sort_by": "salary",
+        "salary_min": 30000,
+        "full_time": 1,
+        "permanent": 1,
+    },
+    nb_pages=2,
+)
 
-# for result in json_data["results"]:
-#     print(result["id"])
-#     print(result["title"])
-#     print(result["description"])
-#     print(f"location: {result['location']['display_name']}")
-#     print(f"category: {result['category']['label']}")
-#     print(f"company: {result['company']['display_name']}")
-#     print(f"URL: {result['redirect_url']}")
-#     print(f"Poste: {result['created']}")
-#     print("\n\n")
+
+# for json_data in results:
+#     print(json.dumps(json_data, indent=4))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 print(Request.get_avg_salary("Software Engineer", ["Django"]))
+
+
+# TODO: Analyse data output and store a json file
+
+# Create a function that requires skills, job title
+# it must return the following
+
+# with the nb of ads in a category, the current date
+# the avg salary (anual) => run Request.get_avg_salary
+# other stats (standard deviation, kurtosis, skewniss, etc)
+# also do this for the main countries (fr, gb, us, de)
+
+
+"""response = Request.get_jobs(
+    country="gb",
+    params={
+        "results_per_page": 20,
+        "what": "javascript developer",
+        "what_exclude": "java",
+        "where": "london",
+        "sort_by": "salary",
+        "salary_min": 30000,
+        "full_time": 1,
+        "permanent": 1,
+    },
+    nb_pages=2,
+)
+
+json_data = response.json()
+
+
+#This code is just to play around and check
+for result in json_data["results"]:
+    print(result["id"])
+    print(result["title"])
+    print(result["description"])
+    print(f"location: {result['location']['display_name']}")
+    print(f"category: {result['category']['label']}")
+    print(f"company: {result['company']['display_name']}")
+    print(f"URL: {result['redirect_url']}")
+    print(f"Poste: {result['created']}")
+    print("\n\n")"""
