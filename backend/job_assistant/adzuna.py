@@ -35,10 +35,10 @@ class Adzuna:
         )
         return params
 
-    def set_avg_salary(self, job: str, skills: list):
+    def set_stats(self, job: str, skills: list):
         """Returns average salary according to skills"""
 
-        file = f"backend/data_stats/avg_salaries.json"
+        file = f"backend/data_stats/stats_salaries.json"
 
         def get_avg_salary_country(country: str) -> int:
             """TODO: doc of the function."""
@@ -63,12 +63,33 @@ class Adzuna:
         # aka: big value = what, small val = what?
         # add on Notion to create an algorithm (later with ML) to interpret these stats values
 
+        # TODO: connect to gdrive to store the json files with Google API
+        
+        if os.path.exists(file):
+            with open(file) as f:
+                try:
+                    data = json.load(f)
+                except json.decoder.JSONDecodeError:
+                    data = {}
+        else:
+            with open(file, mode="w") as f:
+                json.dump({}, f, indent=4)
+
+            data = {}
+
         countries: list = ["gb", "us"]
         all_salaries = []
         average = 0
         nb_success = 0
         date = datetime.datetime.now().strftime("%Y-%m-%d")
-        record = {"date": date}
+        try:
+            if data[date]:
+                print("Record already created")
+                return
+        except KeyError:
+            pass
+        
+        data[date] = {}
 
         for country in countries:
             result = get_avg_salary_country(country)
@@ -76,25 +97,16 @@ class Adzuna:
                 nb_success += 1
                 average += result
                 all_salaries.append(result)
-                record[country] = result
+                data[date][country] = result
 
-        record["std_dev"] = int(np.std(all_salaries))
-        record["kurtosis"] = float(stats.kurtosis(all_salaries))
-        record["skewness"] = float(stats.skew(all_salaries))
+        data[date]["std_dev"] = int(np.std(all_salaries))
+        data[date]["kurtosis"] = float(stats.kurtosis(all_salaries))
+        data[date]["skewness"] = float(stats.skew(all_salaries))
         average = int(average / nb_success)
-        record["avg"] = average
+        data[date]["avg"] = average
 
-        if os.path.exists(file):
-            with open(file) as f:
-                data = json.load(f)
-
-            data.append(record)
-
-            with open(file, mode="w") as f:
-                json.dump(data, f, indent=4)
-        else:
-            with open(file, mode="w") as f:
-                json.dump([record], f, indent=4)
+        with open(file, mode="w") as f:
+            json.dump(data, f, indent=4)
 
     @staticmethod
     def get_jobs(country: str, params: dict, nb_pages: int = 20) -> list:
@@ -120,8 +132,7 @@ class Adzuna:
 # such as developers, software engineer, network administrator, cyber expert, Data Analyst
 # Create a schedule task with "pip install django-crontab" => check doc
 
-# TODO: change the name of this function as it's not only the average: maybe set_infos or set_stats (better)
-Adzuna().set_avg_salary(
+Adzuna().set_stats(
     "Full Stack Developer", ["Django, React, Spring, PostgreSQL, Python, Javascript"]
 )
 
