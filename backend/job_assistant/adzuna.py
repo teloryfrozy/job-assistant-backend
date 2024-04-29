@@ -7,13 +7,17 @@ We will figure out how to organize it properly on time.
 
 import datetime
 import json
-import os
 import logging
-from urllib.parse import urlencode
 import numpy as np
 from scipy import stats
 import requests
-from constants import ADZUNA_API, ADZUNA_APP_ID, ADZUNA_SECRET_KEY
+from gdrive import GoogleDriveManager
+from constants import (
+    ADZUNA_API,
+    ADZUNA_APP_ID,
+    ADZUNA_SECRET_KEY,
+    STATS_SALARIES_FILE_ID,
+)
 
 
 ######################## LOGGING CONFIGURATION ########################
@@ -38,8 +42,6 @@ class Adzuna:
     def set_stats(self, job: str, skills: list):
         """Returns average salary according to skills"""
 
-        file = f"backend/data_stats/stats_salaries.json"
-
         def get_avg_salary_country(country: str) -> int:
             """TODO: doc of the function."""
 
@@ -63,20 +65,7 @@ class Adzuna:
         # aka: big value = what, small val = what?
         # add on Notion to create an algorithm (later with ML) to interpret these stats values
 
-        # TODO: connect to gdrive to store the json files with Google API
-        
-        if os.path.exists(file):
-            with open(file) as f:
-                try:
-                    data = json.load(f)
-                except json.decoder.JSONDecodeError:
-                    data = {}
-        else:
-            with open(file, mode="w") as f:
-                json.dump({}, f, indent=4)
-
-            data = {}
-
+        data = {}
         countries: list = ["gb", "us"]
         all_salaries = []
         average = 0
@@ -88,7 +77,7 @@ class Adzuna:
                 return
         except KeyError:
             pass
-        
+
         data[date] = {}
 
         for country in countries:
@@ -105,8 +94,11 @@ class Adzuna:
         average = int(average / nb_success)
         data[date]["avg"] = average
 
-        with open(file, mode="w") as f:
-            json.dump(data, f, indent=4)
+        # new way to save the data with google drive
+        gdrive_manager = GoogleDriveManager()
+        gdrive_manager.update_json_file(data, STATS_SALARIES_FILE_ID)
+        json_data = gdrive_manager.read_json_file(STATS_SALARIES_FILE_ID)
+        print(json.dumps(json_data, indent=4))
 
     @staticmethod
     def get_jobs(country: str, params: dict, nb_pages: int = 20) -> list:
@@ -135,14 +127,6 @@ class Adzuna:
 Adzuna().set_stats(
     "Full Stack Developer", ["Django, React, Spring, PostgreSQL, Python, Javascript"]
 )
-
-
-
-
-
-
-
-
 
 
 # IGNORE THIS FOR NOW
