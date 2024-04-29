@@ -105,14 +105,20 @@ def read_json_file(file_id):
 def create_folder(folder_name, parent_id="root"):
     """Create a folder with the given name and parent folder ID."""
     try:
+        # Check if a folder with the same name already exists
+        query = f"name='{folder_name}' and '{parent_id}' in parents and trashed=false"
+        existing_folders = DRIVE_SERVICE.files().list(q=query, fields="files(id)").execute()
+        if existing_folders.get("files"):
+            print(f"A folder with the name '{folder_name}' already exists in the folder.")
+            return None
+
+        # Create the folder
         folder_metadata = {
             "name": folder_name,
             "mimeType": "application/vnd.google-apps.folder",
             "parents": [parent_id],
         }
-        folder = (
-            DRIVE_SERVICE.files().create(body=folder_metadata, fields="id").execute()
-        )
+        folder = DRIVE_SERVICE.files().create(body=folder_metadata, fields="id").execute()
         print(f"Folder '{folder_name}' created with ID: {folder.get('id')}")
         return folder.get("id")
     except Exception as e:
@@ -120,9 +126,18 @@ def create_folder(folder_name, parent_id="root"):
         return None
 
 
+
 def create_json_file(file_name, json_content, parent_id="root"):
     """Create a JSON file with the given name, content, and parent folder ID."""
     try:
+        # Check if a file with the same name already exists
+        query = f"name='{file_name}' and '{parent_id}' in parents and trashed=false"
+        existing_files = DRIVE_SERVICE.files().list(q=query, fields="files(id)").execute()
+        if existing_files.get("files"):
+            print(f"A file with the name '{file_name}' already exists in the folder.")
+            return None
+
+        # Create the JSON file
         media_body = MediaIoBaseUpload(
             BytesIO(json.dumps(json_content).encode("utf-8")),
             mimetype="application/json",
@@ -140,5 +155,31 @@ def create_json_file(file_name, json_content, parent_id="root"):
         return None
 
 
+def update_json_file(json_data, file_id):
+    """Update the content of a JSON file with new data."""
+    try:
+        # Serialize the JSON data
+        json_content = json.dumps(json_data)
+
+        # Create media body with updated JSON content
+        media_body = MediaIoBaseUpload(
+            BytesIO(json_content.encode("utf-8")),
+            mimetype="application/json",
+        )
+
+        # Update the file with new content
+        updated_file = DRIVE_SERVICE.files().update(
+            fileId=file_id,
+            media_body=media_body
+        ).execute()
+
+        print(f"JSON file with ID '{file_id}' updated successfully.")
+        return updated_file
+    except Exception as e:
+        print(f"An error occurred while updating the JSON file: {e}")
+        return None
+
+
+update_json_file({"test":"data"}, STATS_SALARIES_FILE_ID)
 json_data = read_json_file(STATS_SALARIES_FILE_ID)
 print(json.dumps(json_data, indent=4))
