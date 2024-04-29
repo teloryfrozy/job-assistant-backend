@@ -32,6 +32,8 @@ ALLOWED_HOSTS = ["127.0.0.1"]
 CORS_ALLOW_ALL_ORIGINS = False
 DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
+# TODO: add creds to send email with zapony.noreply@gmail.com (securely)
+
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 

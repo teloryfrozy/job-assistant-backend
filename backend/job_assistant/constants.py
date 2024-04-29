@@ -6,11 +6,18 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
+# TODO: organize banner and constants
+
 
 ######################## SECURITY ########################
 env_path = Path(__file__).resolve().parent.parent.parent / ".env"
 load_dotenv(dotenv_path=env_path)
 DJANGO_SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+# --- Google Drive --- # 
+JSON_KEY_FILE = "gdrive_creds.json"
+SCOPES = ["https://www.googleapis.com/auth/drive"]
+STATS_SALARIES_FILE_ID = os.getenv("STATS_SALARIES_FILE_ID")
+
 
 
 ######################## JOB OFFERS API ########################
