@@ -16,6 +16,7 @@ from constants import (
     ADZUNA_API,
     ADZUNA_APP_ID,
     ADZUNA_SECRET_KEY,
+    JOBS_TEMPLATES,
     STATS_SALARIES_FILE_ID,
 )
 
@@ -87,7 +88,8 @@ class Adzuna:
                 average += result
                 all_salaries.append(result)
                 data[date][country] = result
-
+        
+        # TODO: save JOB TITLE (very important)
         data[date]["std_dev"] = int(np.std(all_salaries))
         data[date]["kurtosis"] = float(stats.kurtosis(all_salaries))
         data[date]["skewness"] = float(stats.skew(all_salaries))
@@ -98,6 +100,7 @@ class Adzuna:
         gdrive_manager = GoogleDriveManager()
         gdrive_manager.update_json_file(data, STATS_SALARIES_FILE_ID)
         json_data = gdrive_manager.read_json_file(STATS_SALARIES_FILE_ID)
+        print(f"JSON DATA FOR JOB: {job}")
         print(json.dumps(json_data, indent=4))
 
     @staticmethod
@@ -120,13 +123,16 @@ class Adzuna:
         return data
 
 
-# TODO: create a representative list of skills for typical jobs
-# such as developers, software engineer, network administrator, cyber expert, Data Analyst
-# Create a schedule task with "pip install django-crontab" => check doc
+# TODO (Augustin): Create a schedule task with "pip install django-crontab" => check doc
 
-Adzuna().set_stats(
-    "Full Stack Developer", ["Django, React, Spring, PostgreSQL, Python, Javascript"]
-)
+adzuna = Adzuna()
+for job in JOBS_TEMPLATES:
+    for role in JOBS_TEMPLATES[job]:
+        job_title = f"{role} {job}"
+        skills = JOBS_TEMPLATES[job][role]
+        adzuna.set_stats(job_title, skills)
+
+
 
 
 # IGNORE THIS FOR NOW
