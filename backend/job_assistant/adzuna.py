@@ -3,6 +3,15 @@ Handles API calls to Adzuna API
 
 The clarity of the code will be improved later on. For now just write request.
 We will figure out how to organize it properly on time.
+
+
+
+
+
+
+        # also add a doc somewhere to understand what kurtosis and skew means
+        # aka: big value = what, small val = what?
+        # add on Notion to create an algorithm (later with ML) to interpret these stats values
 """
 
 import datetime
@@ -11,8 +20,8 @@ import logging
 import numpy as np
 from scipy import stats
 import requests
-from gdrive import GoogleDriveManager
-from constants import (
+from .gdrive import GoogleDriveManager
+from .constants import (
     ADZUNA_API,
     ADZUNA_APP_ID,
     ADZUNA_SECRET_KEY,
@@ -58,13 +67,21 @@ class Adzuna:
                 LOGGER.error(f"{response.reason}, {response.status_code}")
                 return None
 
+
+        
+        # new way to save the data with google drive
+        gdrive_manager = GoogleDriveManager()
+
+        print("=============== BEFORE UPDATING ============")        
+        json_data:dict = gdrive_manager.read_json_file(STATS_SALARIES_FILE_ID)
+        print(json.dumps(json_data, indent=4))
+
+
+
         # TODO: store other useful stats
         # other stats that I forgot: mean, min, max
         # also do this for the main countries (gb, us)
 
-        # also add a doc somewhere to understand what kurtosis and skew means
-        # aka: big value = what, small val = what?
-        # add on Notion to create an algorithm (later with ML) to interpret these stats values
 
         data = {}
         countries: list = ["gb", "us"]
@@ -72,14 +89,8 @@ class Adzuna:
         average = 0
         nb_success = 0
         date = datetime.datetime.now().strftime("%Y-%m-%d")
-        try:
-            if data[date]:
-                print("Record already created")
-                return
-        except KeyError:
-            pass
-
-        data[date] = {}
+        if not json_data.get(date):
+                json_data[date] = {}
 
         for country in countries:
             result = get_avg_salary_country(country)
@@ -87,21 +98,24 @@ class Adzuna:
                 nb_success += 1
                 average += result
                 all_salaries.append(result)
-                data[date][country] = result
-        
-        # TODO: save JOB TITLE (very important)
-        data[date]["std_dev"] = int(np.std(all_salaries))
-        data[date]["kurtosis"] = float(stats.kurtosis(all_salaries))
-        data[date]["skewness"] = float(stats.skew(all_salaries))
+                data[country] = result
+                
+        # # TODO: save JOB TITLE (very important)
+        data["std_dev"] = int(np.std(all_salaries))
+        data["kurtosis"] = float(stats.kurtosis(all_salaries))
+        data["skewness"] = float(stats.skew(all_salaries))
         average = int(average / nb_success)
-        data[date]["avg"] = average
+        data["avg"] = average
 
-        # new way to save the data with google drive
-        gdrive_manager = GoogleDriveManager()
-        gdrive_manager.update_json_file(data, STATS_SALARIES_FILE_ID)
-        json_data = gdrive_manager.read_json_file(STATS_SALARIES_FILE_ID)
-        print(f"JSON DATA FOR JOB: {job}")
-        print(json.dumps(json_data, indent=4))
+
+
+        json_data[date][job] = data
+
+        
+        print("=============== AFTER UPDATING ============")   
+        gdrive_manager.overwrite_json_file(json_data, STATS_SALARIES_FILE_ID)
+        new_json_data = gdrive_manager.read_json_file(STATS_SALARIES_FILE_ID)
+        print(json.dumps(new_json_data, indent=4))
 
     @staticmethod
     def get_jobs(country: str, params: dict, nb_pages: int = 20) -> list:

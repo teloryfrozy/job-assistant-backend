@@ -25,14 +25,19 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
+######################## SCHEDULED TASKS ########################
+# under developement (do not delete)
+# visual tool: https://crontab.guru/
+CRONJOBS = [
+    ("0 3 * * SUN", "myapp.cron.cronfunction") # At 03:00 on Sunday
+]
+
 
 ######################## SECURITY ########################
 DEBUG = True
 ALLOWED_HOSTS = ["127.0.0.1"]
 CORS_ALLOW_ALL_ORIGINS = False
 DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
-
-# TODO: add creds to send email with zapony.noreply@gmail.com (securely)
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases

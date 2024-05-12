@@ -6,7 +6,7 @@ from io import BytesIO
 import json
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
-from constants import JSON_KEY_FILE, SCOPES
+from .constants import JSON_KEY_FILE, SCOPES
 from googleapiclient.http import MediaIoBaseUpload
 
 
@@ -15,6 +15,7 @@ from googleapiclient.http import MediaIoBaseUpload
 # TODO: organize functions and clean the documentation
 
 # TODO: Remove all comments. Keep only the documentation.
+# TODO: use colorama to print message with colors
 
 # TODO: add clean logging INSTEAD of debug prints (very important)
 # Always have a clean format for errors => already setup with json logger format in settings
@@ -158,15 +159,15 @@ class GoogleDriveManager:
             print(f"An error occurred while creating the JSON file: {e}")
             return None
 
-    def update_json_file(self, json_data, file_id):
-        """Update the content of a JSON file with new data."""
+    def overwrite_json_file(self, new_json_data, file_id):
+        """Overwrites the content of a JSON file with new data."""
         try:
-            # Serialize the JSON data
-            json_content = json.dumps(json_data)
+            # Serialize the new JSON data
+            new_json_content = json.dumps(new_json_data)
 
             # Create media body with updated JSON content
             media_body = MediaIoBaseUpload(
-                BytesIO(json_content.encode("utf-8")),
+                BytesIO(new_json_content.encode("utf-8")),
                 mimetype="application/json",
             )
 
@@ -182,3 +183,4 @@ class GoogleDriveManager:
         except Exception as e:
             print(f"An error occurred while updating the JSON file: {e}")
             return None
+
