@@ -124,6 +124,7 @@ celerybeat.pid
 
 # Environments
 py_env/
+my_new_env/
 .env
 .venv
 env/

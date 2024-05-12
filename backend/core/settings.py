@@ -5,9 +5,14 @@ QUICK-START DEVELOPMENT SETTINGS - UNSUITABLE FOR PRODUCTION
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 """
 
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
 from pathlib import Path
 from datetime import timedelta
-from job_assistant.constants import DJANGO_SECRET_KEY
+from backend.job_assistant.constants import DJANGO_SECRET_KEY
 
 
 ######################## GENERAL CONFIGURATION ########################
@@ -24,14 +29,6 @@ LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
-
-######################## SCHEDULED TASKS ########################
-# under developement (do not delete)
-# visual tool: https://crontab.guru/
-CRONJOBS = [
-    ("0 3 * * SUN", "backend.core.scheduled_tasks.adzuna_run") # At 03:00 on Sunday
-]
-
 
 ######################## SECURITY ########################
 DEBUG = True
@@ -110,6 +107,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_crontab",
 ]
 
 MIDDLEWARE = [
@@ -171,3 +169,17 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+######################## SCHEDULED TASKS ########################
+# under developement (do not delete)
+# visual tool: https://crontab.guru/
+
+# if someone smart can debug this import issue 🤪🤔
+def dummy_task():
+    print("Hello from dummy task!")
+CRONJOBS = [
+    ("*/1 * * * *", "dummy_task")
+]
+
+    #("0 3 * * SUN", "backend.core.cron.adzuna_run"),  # At 03:00 on Sunday
+    #("*/1 * * * *", "backend.core.cron.test_run"),

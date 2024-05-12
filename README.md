@@ -20,5 +20,5 @@ sudo ./start_backend.sh
 To stop the backend server running on port 9000, execute the following command:
 
 ```bash
-sudo kill $(sudo lsof -t -i:9000)
+sudo kill -9 $(sudo lsof -t -i:9000)
 ```

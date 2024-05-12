@@ -5,7 +5,7 @@ The clarity of the code will be improved later on. For now just write request.
 We will figure out how to organize it properly on time.
 
 
-
+TODO: check currency (very very likely to be GBP)
 
 
 
@@ -25,7 +25,6 @@ from .constants import (
     ADZUNA_API,
     ADZUNA_APP_ID,
     ADZUNA_SECRET_KEY,
-    JOBS_TEMPLATES,
     STATS_SALARIES_FILE_ID,
 )
 
@@ -35,11 +34,23 @@ LOGGER = logging.getLogger(__name__)
 
 
 class Adzuna:
+    """
+    Class for interacting with the Adzuna API and performing statistical analysis on job salaries.
+    """
 
     def __init__(self) -> None:
         pass
 
     def get_params(self, params: dict) -> dict:
+        """
+        Adds Adzuna API credentials to the request parameters.
+
+        Args:
+            params (dict): Dictionary of request parameters.
+
+        Returns:
+            dict: Updated dictionary with API credentials.
+        """
         params.update(
             {
                 "app_id": ADZUNA_APP_ID,
@@ -50,11 +61,25 @@ class Adzuna:
         return params
 
     def set_stats(self, job: str, skills: list):
-        """Returns average salary according to skills"""
+        """
+        Retrieves job statistics including average salary, standard deviation, kurtosis, and skewness
+        based on job title and skills.
+
+        Args:
+            job (str): Job title.
+            skills (list): List of skills required for the job.
+        """
 
         def get_avg_salary_country(country: str) -> int:
-            """TODO: doc of the function."""
+            """
+            Retrieves the average salary for a specific country.
 
+            Args:
+                country (str): Country code.
+
+            Returns:
+                int: Average salary.
+            """
             url = f"{ADZUNA_API}jobs/{country}/jobsworth?"
             params = self.get_params({"title": job, "description": ",".join(skills)})
 
@@ -64,23 +89,15 @@ class Adzuna:
                 salary: int = data["salary"]
                 return salary
             else:
-                LOGGER.error(f"{response.reason}, {response.status_code}")
+                error_msg = f"Failed to retrieve average salary for country {country}. "
+                error_msg += (
+                    f"Status code: {response.status_code}, Reason: {response.reason}"
+                )
+                LOGGER.error(error_msg)
                 return None
 
-
-        
         gdrive_manager = GoogleDriveManager()
-
-        print("=============== BEFORE UPDATING ============")        
-        json_data:dict = gdrive_manager.read_json_file(STATS_SALARIES_FILE_ID)
-        print(json.dumps(json_data, indent=4))
-
-
-
-        # TODO: store other useful stats
-        # other stats that I forgot: mean, min, max
-        # also do this for the main countries (gb, us)
-
+        json_data: dict = gdrive_manager.read_json_file(STATS_SALARIES_FILE_ID)
 
         data = {}
         countries = ["gb", "us"]
@@ -89,7 +106,7 @@ class Adzuna:
         nb_success = 0
         date = datetime.datetime.now().strftime("%Y-%m-%d")
         if not json_data.get(date):
-                json_data[date] = {}
+            json_data[date] = {}
 
         for country in countries:
             result = get_avg_salary_country(country)
@@ -98,28 +115,29 @@ class Adzuna:
                 average += result
                 all_salaries.append(result)
                 data[country] = result
-                
-                
+
         data["std_dev"] = int(np.std(all_salaries))
         data["kurtosis"] = float(stats.kurtosis(all_salaries))
         data["skewness"] = float(stats.skew(all_salaries))
         average = int(average / nb_success)
         data["avg"] = average
 
-
-
         json_data[date][job] = data
-
-        
-        print("=============== AFTER UPDATING ============")   
         gdrive_manager.overwrite_json_file(json_data, STATS_SALARIES_FILE_ID)
-        new_json_data = gdrive_manager.read_json_file(STATS_SALARIES_FILE_ID)
-        print(json.dumps(new_json_data, indent=4))
 
     @staticmethod
     def get_jobs(country: str, params: dict, nb_pages: int = 20) -> list:
-        """Fetches jobs data from the Adzuna API."""
+        """
+        Fetches job data from the Adzuna API.
 
+        Args:
+            country (str): Country code.
+            params (dict): Dictionary of request parameters.
+            nb_pages (int, optional): Number of pages to fetch. Defaults to 20.
+
+        Returns:
+            list: List of job data.
+        """
         params = Adzuna().get_params(params)
         data = []
 
@@ -130,65 +148,11 @@ class Adzuna:
             if response.status_code == 200:
                 data.append(response.json())
             else:
-                LOGGER.error(f"{response.reason}, {response.status_code}")
+                error_msg = f"Failed to fetch jobs data from URL: {url}. "
+                error_msg += (
+                    f"Status code: {response.status_code}, Reason: {response.reason}"
+                )
+                LOGGER.error(error_msg)
                 return data
 
         return data
-
-
-
-
-
-
-# IGNORE THIS FOR NOW
-"""
-results = Request.get_jobs(
-    country="gb",
-    params={
-        "results_per_page": 20,
-        "what": "javascript developer",
-        "what_exclude": "java",
-        "where": "london",
-        "sort_by": "salary",
-        "salary_min": 30000,
-        "full_time": 1,
-        "permanent": 1,
-    },
-    nb_pages=2,
-)
-"""
-
-
-# for json_data in results:
-#     print(json.dumps(json_data, indent=4))
-
-
-"""response = Request.get_jobs(
-    country="gb",
-    params={
-        "results_per_page": 20,
-        "what": "javascript developer",
-        "what_exclude": "java",
-        "where": "london",
-        "sort_by": "salary",
-        "salary_min": 30000,
-        "full_time": 1,
-        "permanent": 1,
-    },
-    nb_pages=2,
-)
-
-json_data = response.json()
-
-
-#This code is just to play around and check
-for result in json_data["results"]:
-    print(result["id"])
-    print(result["title"])
-    print(result["description"])
-    print(f"location: {result['location']['display_name']}")
-    print(f"category: {result['category']['label']}")
-    print(f"company: {result['company']['display_name']}")
-    print(f"URL: {result['redirect_url']}")
-    print(f"Poste: {result['created']}")
-    print("\n\n")"""
