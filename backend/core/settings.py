@@ -29,7 +29,7 @@ USE_TZ = True
 # under developement (do not delete)
 # visual tool: https://crontab.guru/
 CRONJOBS = [
-    ("0 3 * * SUN", "myapp.cron.cronfunction") # At 03:00 on Sunday
+    ("0 3 * * SUN", "backend.core.scheduled_tasks.adzuna_run") # At 03:00 on Sunday
 ]
 
 

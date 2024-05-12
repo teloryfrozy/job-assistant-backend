@@ -69,7 +69,6 @@ class Adzuna:
 
 
         
-        # new way to save the data with google drive
         gdrive_manager = GoogleDriveManager()
 
         print("=============== BEFORE UPDATING ============")        
@@ -84,7 +83,7 @@ class Adzuna:
 
 
         data = {}
-        countries: list = ["gb", "us"]
+        countries = ["gb", "us"]
         all_salaries = []
         average = 0
         nb_success = 0
@@ -100,7 +99,7 @@ class Adzuna:
                 all_salaries.append(result)
                 data[country] = result
                 
-        # # TODO: save JOB TITLE (very important)
+                
         data["std_dev"] = int(np.std(all_salaries))
         data["kurtosis"] = float(stats.kurtosis(all_salaries))
         data["skewness"] = float(stats.skew(all_salaries))
@@ -137,14 +136,6 @@ class Adzuna:
         return data
 
 
-# TODO (Augustin): Create a schedule task with "pip install django-crontab" => check doc
-
-adzuna = Adzuna()
-for job in JOBS_TEMPLATES:
-    for role in JOBS_TEMPLATES[job]:
-        job_title = f"{role} {job}"
-        skills = JOBS_TEMPLATES[job][role]
-        adzuna.set_stats(job_title, skills)
 
 
 

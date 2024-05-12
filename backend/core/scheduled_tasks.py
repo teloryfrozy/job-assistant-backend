@@ -11,11 +11,10 @@ from backend.job_assistant.adzuna import Adzuna
 from backend.job_assistant.constants import JOBS_TEMPLATES
 
 
-class JobStats:
-    """TODO: explain this class is about job stats."""
 
-    def adzuna_run():
+def adzuna_run():
         """Scan salaries data and save them for analytical purposes."""
+
         adzuna = Adzuna()
         for job in JOBS_TEMPLATES:
             for role in JOBS_TEMPLATES[job]:
