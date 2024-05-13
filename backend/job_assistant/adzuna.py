@@ -123,6 +123,7 @@ class Adzuna:
         data["avg"] = average
 
         json_data[date][job] = data
+        print(json_data)
         gdrive_manager.overwrite_json_file(json_data, STATS_SALARIES_FILE_ID)
 
     @staticmethod

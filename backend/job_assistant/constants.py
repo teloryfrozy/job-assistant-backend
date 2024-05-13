@@ -1,7 +1,9 @@
 """
 Environment creds and others constants
-"""
 
+Constants defined here should be used in at least 2 differents files or they are secrets coming from .env file
+Otherwise they should be defined locally
+"""
 import os
 from pathlib import Path
 from dotenv import load_dotenv

@@ -22,7 +22,7 @@ from backend.job_assistant.constants import AWANLLM_SECRET_KEY, FINDWORK_SECRET_
 from backend.core.cron import adzuna_run
 
 
-#adzuna_run()
+adzuna_run()
 
 
 
