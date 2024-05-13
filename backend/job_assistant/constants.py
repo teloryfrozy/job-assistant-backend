@@ -191,3 +191,10 @@ ADZUNA_COUNTRY_EXTENSIONS = [
 
 ######################## REED CO UK ########################
 REED_CO_UK_SECRET_KEY = os.getenv("REED_CO_UK_SECRET_KEY")
+
+######################## FINDWORK ########################
+FINDWORK_SECRET_KEY = os.getenv("FINDWORK_SECRET_KEY")
+
+
+# AWANLLM
+AWANLLM_SECRET_KEY = os.getenv("AWANLLM_SECRET_KEY")

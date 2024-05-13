@@ -3,6 +3,11 @@ THIS file is just for testing purpose to avoid the hassle of imports
 """
 
 
+# VERY IMPORTANT
+# https://developers.greenhouse.io/job-board.html#submit-an-application
+# => submit via an API
+
+
 
 
 import json
@@ -13,11 +18,79 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 
-from backend.job_assistant.constants import REED_CO_UK_SECRET_KEY
+from backend.job_assistant.constants import AWANLLM_SECRET_KEY, FINDWORK_SECRET_KEY, REED_CO_UK_SECRET_KEY
 from backend.core.cron import adzuna_run
 
 
 #adzuna_run()
+
+
+
+# ONLY FOR JOB SEARCH - NO SALARY PROVIDED => can still be used for stats
+# FREE API: no parameters => need to be checked with a loop
+'''
+url = "https://www.arbeitnow.com/api/job-board-api"
+'''
+
+# ONLY FOR JOB SEARCH - NO SALARY PROVIDED => can still be used for stats
+# FREE API: no parameters => need to be checked with a loop
+# doc: https://www.themuse.com/developers/api/v2
+'''
+url = "https://www.themuse.com/api/public/jobs?category=Accounting&page=1"
+'''
+
+# ONLY FOR JOB SEARCH - NO SALARY PROVIDED => can still be used for stats
+'''import requests
+
+# Define your API key
+API_KEY = FINDWORK_SECRET_KEY
+
+# Define the URL
+url = "https://findwork.dev/api/jobs/"
+
+# Define the parameters
+params = {
+    "location": "london",
+    "search": "Full Stack Developer",
+    "skills": "HTML,CSS,JavaScript,Python,Django,React,Git,Testing",
+    "level": "Junior",
+    "sort_by": "relevance"
+}
+
+# Define the headers with the authorization token
+headers = {
+    "Authorization": f"Token {API_KEY}"
+}
+
+# Send the GET request
+response = requests.get(url, params=params, headers=headers)
+
+# Check if the request was successful (status code 200)
+if response.status_code == 200:
+    # Extract and print the JSON data
+    data = response.json()
+    
+    print(json.dumps(data["results"][0], indent=4))
+else:
+    # Print an error message if the request was not successful
+    print(f"Error: {response.status_code} - {response.reason}")'''
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
