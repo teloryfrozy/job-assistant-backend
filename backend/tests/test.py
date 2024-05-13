@@ -2,12 +2,9 @@
 THIS file is just for testing purpose to avoid the hassle of imports
 """
 
-
 # VERY IMPORTANT
 # https://developers.greenhouse.io/job-board.html#submit-an-application
 # => submit via an API
-
-
 
 
 import json
@@ -18,84 +15,36 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 
-from backend.job_assistant.constants import AWANLLM_SECRET_KEY, FINDWORK_SECRET_KEY, REED_CO_UK_SECRET_KEY
+from backend.job_assistant.constants import (
+    AWANLLM_SECRET_KEY,
+    EXPERIENCE_LEVELS,
+    FINDWORK_SECRET_KEY,
+    IT_JOBS,
+    REED_CO_UK_SECRET_KEY,
+)
 from backend.core.cron import adzuna_run
 
 
-adzuna_run()
-
+# adzuna_run()
 
 
 # ONLY FOR JOB SEARCH - NO SALARY PROVIDED => can still be used for stats
 # FREE API: no parameters => need to be checked with a loop
-'''
+"""
 url = "https://www.arbeitnow.com/api/job-board-api"
-'''
+"""
 
 # ONLY FOR JOB SEARCH - NO SALARY PROVIDED => can still be used for stats
 # FREE API: no parameters => need to be checked with a loop
 # doc: https://www.themuse.com/developers/api/v2
-'''
+"""
 url = "https://www.themuse.com/api/public/jobs?category=Accounting&page=1"
-'''
-
-# ONLY FOR JOB SEARCH - NO SALARY PROVIDED => can still be used for stats
-
-# DOC: https://findwork.dev/developers/
-'''import requests
-
-# Define your API key
-API_KEY = FINDWORK_SECRET_KEY
-
-# Define the URL
-url = "https://findwork.dev/api/jobs/"
-
-# Define the parameters
-params = {
-    "search": "Full Stack Developer",
-    "level": "Junior",
-    "sort_by": "relevance"
-}
-# Define the headers with the authorization token
-headers = {
-    "Authorization": f"Token {API_KEY}"
-}
-
-# Send the GET request
-response = requests.get(url, params=params, headers=headers)
-
-# Check if the request was successful (status code 200)
-if response.status_code == 200:
-    # Extract and print the JSON data
-    data = response.json()
-    total_result = data["count"]
-    print(total_result)
-else:
-    # Print an error message if the request was not successful
-    print(f"Error: {response.status_code} - {response.reason}")
-'''
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+"""
 
 
 # THIS CODE IS USED TO SEE HOW DATA LOOKS LIKE WITH REED.CO.UK
 
-'''import requests
+"""import requests
 
 # Define the API endpoint URL
 api_url = "https://www.reed.co.uk/api/1.0/search"
@@ -144,38 +93,9 @@ if response.status_code == 200:
 else:
     # Print an error message if the request was not successful
     print(f"Error: {response.status_code} - {response.reason}")
-'''
+"""
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# ADZUNA
 # IGNORE THIS FOR NOW
 """
 results = Request.get_jobs(

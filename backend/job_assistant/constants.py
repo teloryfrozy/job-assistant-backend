@@ -36,38 +36,19 @@ IT_JOBS = [
 
 ######################## JOB OFFERS API ########################
 
-######################## ADZUNA ########################
+# ----------------------- ADZUNA ----------------------- #
 ADZUNA_API = "https://api.adzuna.com/v1/api/"
 ADZUNA_APP_ID = os.getenv("ADZUNA_APP_ID")
 ADZUNA_SECRET_KEY = os.getenv("ADZUNA_SECRET_KEY")
-ADZUNA_COUNTRY_EXTENSIONS = [
-    "gb",
-    "us",
-    "at",
-    "au",
-    "be",
-    "br",
-    "ca",
-    "ch",
-    "de",
-    "es",
-    "fr",
-    "in",
-    "it",
-    "mx",
-    "nl",
-    "nz",
-    "pl",
-    "sg",
-    "za",
-]
 
-######################## REED CO UK ########################
+# ----------------------- REED CO UK ----------------------- #
 REED_CO_UK_SECRET_KEY = os.getenv("REED_CO_UK_SECRET_KEY")
 
-######################## FINDWORK ########################
+# ----------------------- FINDWORK ----------------------- #
 FINDWORK_SECRET_KEY = os.getenv("FINDWORK_SECRET_KEY")
 
 
-# AWANLLM
+######################## ARTIFICIAL INTELLIGENCE ########################
+
+# ----------------------- AWANLLM ----------------------- #
 AWANLLM_SECRET_KEY = os.getenv("AWANLLM_SECRET_KEY")

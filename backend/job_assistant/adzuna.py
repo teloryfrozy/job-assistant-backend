@@ -28,6 +28,29 @@ from .constants import (
     STATS_SALARIES_FILE_ID,
 )
 
+# TODO: if we can get job offers with all extensions
+ADZUNA_COUNTRY_EXTENSIONS = [
+    "gb",
+    "us",
+    "at",
+    "au",
+    "be",
+    "br",
+    "ca",
+    "ch",
+    "de",
+    "es",
+    "fr",
+    "in",
+    "it",
+    "mx",
+    "nl",
+    "nz",
+    "pl",
+    "sg",
+    "za",
+]
+
 
 ######################## LOGGING CONFIGURATION ########################
 LOGGER = logging.getLogger(__name__)
