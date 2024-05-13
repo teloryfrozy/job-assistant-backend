@@ -40,6 +40,8 @@ url = "https://www.themuse.com/api/public/jobs?category=Accounting&page=1"
 '''
 
 # ONLY FOR JOB SEARCH - NO SALARY PROVIDED => can still be used for stats
+
+# DOC: https://findwork.dev/developers/
 '''import requests
 
 # Define your API key
@@ -50,13 +52,10 @@ url = "https://findwork.dev/api/jobs/"
 
 # Define the parameters
 params = {
-    "location": "london",
     "search": "Full Stack Developer",
-    "skills": "HTML,CSS,JavaScript,Python,Django,React,Git,Testing",
     "level": "Junior",
     "sort_by": "relevance"
 }
-
 # Define the headers with the authorization token
 headers = {
     "Authorization": f"Token {API_KEY}"
@@ -69,12 +68,12 @@ response = requests.get(url, params=params, headers=headers)
 if response.status_code == 200:
     # Extract and print the JSON data
     data = response.json()
-    
-    print(json.dumps(data["results"][0], indent=4))
+    total_result = data["count"]
+    print(total_result)
 else:
     # Print an error message if the request was not successful
-    print(f"Error: {response.status_code} - {response.reason}")'''
-
+    print(f"Error: {response.status_code} - {response.reason}")
+'''
 
 
 

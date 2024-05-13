@@ -4,6 +4,7 @@ Environment creds and others constants
 Constants defined here should be used in at least 2 differents files or they are secrets coming from .env file
 Otherwise they should be defined locally
 """
+
 import os
 from pathlib import Path
 from dotenv import load_dotenv
@@ -23,145 +24,15 @@ SCOPES = ["https://www.googleapis.com/auth/drive"]
 STATS_SALARIES_FILE_ID = os.getenv("STATS_SALARIES_FILE_ID")
 
 
-# Job template / typical jobs
-# TODO: read and check if skills are relevant
-JOBS_TEMPLATES = {
-    "Full Stack Developer": {
-        "Intern": ["HTML", "CSS", "JavaScript"],
-        "Junior": [
-            "HTML",
-            "CSS",
-            "JavaScript",
-            "Python",
-            "Django",
-            "React",
-            "Git",
-            "Testing",
-        ],
-        "Senior": [
-            "HTML",
-            "CSS",
-            "JavaScript",
-            "Python",
-            "Django",
-            "React",
-            "Git",
-            "Testing",
-            "Node.js",
-            "SQL",
-            "DevOps",
-            "AWS",
-            "Azure",
-        ],
-    },
-    "Network Administrator": {
-        "Intern": ["IP", "Switch", "Routing", "Virtualization"],
-        "Junior": [
-            "IP",
-            "Switch",
-            "Routing",
-            "Virtualization",
-            "CCNA3",
-            "Monitoring",
-            "Active Directory",
-        ],
-        "Senior": [
-            "IP",
-            "Switch",
-            "Routing",
-            "Virtualization",
-            "CCNA3",
-            "Monitoring",
-            "Active Directory",
-            "Network Automation",
-            "TCP",
-            "UDP",
-            "Cloud",
-            "Backup",
-            "WLAN",
-            "Powershell",
-        ],
-    },
-    "Software Engineer": {
-        "Intern": ["Python", "Java", "Data Structures", "Algorithms"],
-        "Junior": [
-            "Python",
-            "Java",
-            "Data Structures",
-            "Algorithms",
-            "Python",
-            "Java",
-            "C++",
-            "Testing",
-        ],
-        "Senior": [
-            "Python",
-            "Java",
-            "C++",
-            "Testing",
-            "System Design",
-            "Software Architecture",
-            "Agile",
-            "Mentorship",
-            "PostgreSQL",
-            "Oracle",
-            "MariaDB",
-        ],
-    },
-    "Cybersecurity Analyst": {
-        "Intern": ["Network", "Phishing", "PRTG"],
-        "Junior": ["Network", "Phishing", "PRTG", "SIEM", "Scanning", "Solarwinds"],
-        "Senior": [
-            "Network",
-            "Phishing",
-            "PRTG",
-            "SIEM",
-            "Scanning",
-            "Solarwinds",
-            "NIST",
-            "Penetration Testing",
-            "Cloud Security",
-            "Security Audits",
-        ],
-    },
-    "Data Analyst": {
-        "Intern": ["Excel", "Data Cleaning", "Data Visualization", "Tableau"],
-        "Junior": [
-            "Excel",
-            "Data Cleaning",
-            "Data Visualization",
-            "Tableau",
-            "Pandas",
-            "Numpy",
-            "SQL",
-            "Python",
-            "Data Wrangling",
-            "Data Visualization",
-            "Data Warehousing",
-            "Machine Learning",
-        ],
-        "Senior": [
-            "Excel",
-            "Data Cleaning",
-            "Data Visualization",
-            "Tableau",
-            "Pandas",
-            "Numpy",
-            "SQL",
-            "Python",
-            "Data Wrangling",
-            "Data Visualization",
-            "Data Warehousing",
-            "Machine Learning",
-            "Statistics",
-            "Spark",
-            "Hadoop",
-            "Data Modeling",
-            "Deep Learning",
-        ],
-    },
-}
-
+# Job templates / typical jobs
+EXPERIENCE_LEVELS = ["Intern", "Junior", "Senior"]
+IT_JOBS = [
+    "Full Stack Developer",
+    "Network Administrator",
+    "Software Engineer",
+    "Cybersecurity Analyst",
+    "Data Analyst",
+]
 
 ######################## JOB OFFERS API ########################
 

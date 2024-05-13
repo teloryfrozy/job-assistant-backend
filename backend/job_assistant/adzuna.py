@@ -60,7 +60,7 @@ class Adzuna:
         )
         return params
 
-    def set_stats(self, job: str, skills: list):
+    def set_stats(self, job: str):
         """
         Retrieves job statistics including average salary, standard deviation, kurtosis, and skewness
         based on job title and skills.
@@ -81,7 +81,7 @@ class Adzuna:
                 int: Average salary.
             """
             url = f"{ADZUNA_API}jobs/{country}/jobsworth?"
-            params = self.get_params({"title": job, "description": ",".join(skills)})
+            params = self.get_params({"title": job})
 
             response = requests.get(url, params=params)
             if response.status_code == 200:
