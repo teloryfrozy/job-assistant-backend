@@ -14,21 +14,16 @@ TODO: check currency (very very likely to be GBP)
         # add on Notion to create an algorithm (later with ML) to interpret these stats values
 """
 
-import datetime
-import json
 import logging
-import numpy as np
-from scipy import stats
 import requests
-from .gdrive import GoogleDriveManager
-from .constants import (
+from backend.job_assistant.jobs_providers.job_statistics import JobStatisticsManager
+from ..constants import (
     ADZUNA_API,
     ADZUNA_APP_ID,
     ADZUNA_SECRET_KEY,
-    STATS_SALARIES_FILE_ID,
 )
 
-# TODO: if we can get job offers with all extensions
+# TODO: check if we can get job offers with all extensions
 ADZUNA_COUNTRY_EXTENSIONS = [
     "gb",
     "us",
@@ -61,8 +56,8 @@ class Adzuna:
     Class for interacting with the Adzuna API and performing statistical analysis on job salaries.
     """
 
-    def __init__(self) -> None:
-        pass
+    def __init__(self, job_statistics_manager: JobStatisticsManager) -> None:
+        self.job_statistics_manager = job_statistics_manager
 
     def get_params(self, params: dict) -> dict:
         """
@@ -83,7 +78,7 @@ class Adzuna:
         )
         return params
 
-    def set_stats(self, job: str):
+    def set_salaries_stats(self, job: str):
         """
         Retrieves job statistics including average salary, standard deviation, kurtosis, and skewness
         based on job title and skills.
@@ -119,17 +114,11 @@ class Adzuna:
                 LOGGER.error(error_msg)
                 return None
 
-        gdrive_manager = GoogleDriveManager()
-        json_data: dict = gdrive_manager.read_json_file(STATS_SALARIES_FILE_ID)
-
         data = {}
         countries = ["gb", "us"]
         all_salaries = []
         average = 0
         nb_success = 0
-        date = datetime.datetime.now().strftime("%Y-%m-%d")
-        if not json_data.get(date):
-            json_data[date] = {}
 
         for country in countries:
             result = get_avg_salary_country(country)
@@ -139,15 +128,8 @@ class Adzuna:
                 all_salaries.append(result)
                 data[country] = result
 
-        data["std_dev"] = int(np.std(all_salaries))
-        data["kurtosis"] = float(stats.kurtosis(all_salaries))
-        data["skewness"] = float(stats.skew(all_salaries))
-        average = int(average / nb_success)
-        data["avg"] = average
-
-        json_data[date][job] = data
-        print(json_data)
-        gdrive_manager.overwrite_json_file(json_data, STATS_SALARIES_FILE_ID)
+        if all_salaries:
+            self.job_statistics_manager.store_salaries_statistics(job, all_salaries)
 
     @staticmethod
     def get_jobs(country: str, params: dict, nb_pages: int = 20) -> list:

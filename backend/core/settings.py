@@ -178,7 +178,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 def dummy_task():
     print("Hello from dummy task!")
 CRONJOBS = [
-    ("*/1 * * * *", "dummy_task")
+    ("*/1 * * * *", "settings.dummy_task")
 ]
 
     #("0 3 * * SUN", "backend.core.cron.adzuna_run"),  # At 03:00 on Sunday

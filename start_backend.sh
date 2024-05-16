@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Start PostgreSQL
-# sudo service postgresql start
-
 # Get the absolute path
 ABS_PATH=$(pwd)
 
@@ -14,4 +11,4 @@ cd backend
 python3 manage.py makemigrations
 python3 manage.py migrate
 python manage.py crontab add
-python3 manage.py runserver 9000  # Run the backend server in the background
+python3 manage.py runserver 9000
