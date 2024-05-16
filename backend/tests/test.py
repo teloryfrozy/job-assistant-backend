@@ -12,6 +12,8 @@ import json
 import sys
 import os
 
+import requests
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 
@@ -29,27 +31,27 @@ from backend.job_assistant.constants import (
 
 GOOGLE_DRIVE_MANAGER = GoogleDriveManager()
 
-from backend.core.cron import adzuna_run, reed_co_uk_run, find_work_run
+from backend.core.cron import adzuna_run, reed_co_uk_run, find_work_run, the_muse_run
 
 # find_work_run()
+the_muse_run()
 # reed_co_uk_run()
 # adzuna_run()
 
 
-# ONLY FOR JOB SEARCH
-# FREE API: no parameters (ONLY JOB OFFERS IN GERMAN)
-"""
-url = "https://www.arbeitnow.com/api/job-board-api"
-"""
 
-# ONLY FOR JOB SEARCH - NO SALARY PROVIDED => can still be used for stats
-# FREE API: no parameters => need to be checked with a loop
-# doc: https://www.themuse.com/developers/api/v2
+url = "https://www.themuse.com/api/search-renderer/jobs?ctsEnabled=true&query=Full Stack Developer&level=internship,entry,mid,senior,management&category=software_engineering,computer_it&posted_date_range=last_30d"
 
-# https://www.themuse.com/api/public/jobs?category=Account%20Management&category=IT&level=Entry%20Level&level=Senior%20Level&page=1
-"""
-url = "https://www.themuse.com/api/public/jobs?category=Accounting&page=1"
-"""
+
+response = requests.get(url)
+if response.status_code == 200:
+    data = response.json()
+    number_offers = data["count"]
+    print(number_offers)
+else:
+    # TODO: LOGGER.ERROR
+    print(f"Error: {response.status_code} - {response.reason}")
+
 
 
 # ADZUNA

@@ -52,6 +52,9 @@ REED_CO_UK = "ReedCoUk"
 FINDWORK_SECRET_KEY = os.getenv("FINDWORK_SECRET_KEY")
 FINDWORK = "Findwork"
 
+# ----------------------- The Muse ----------------------- #
+THE_MUSE = "TheMuse"
+
 
 ######################## ARTIFICIAL INTELLIGENCE ########################
 

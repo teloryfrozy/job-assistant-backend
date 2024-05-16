@@ -17,7 +17,9 @@ from backend.job_assistant.constants import (
     IT_JOBS,
     EXPERIENCE_LEVELS,
     REED_CO_UK,
+    THE_MUSE,
 )
+from backend.job_assistant.jobs_providers.the_muse import TheMuse
 
 GOOGLE_DRIVE_MANAGER = GoogleDriveManager()
 
@@ -34,6 +36,18 @@ def adzuna_run():
             adzuna.set_salaries_stats(job_title)
 
 
+def reed_co_uk_run():
+    """
+    Collects and stores salary statistics from Reed.co.uk for IT jobs at various experience levels.
+    """
+    job_statistics_manager = JobStatisticsManager(GOOGLE_DRIVE_MANAGER, REED_CO_UK)
+    reed_co_uk = ReedCoUk(job_statistics_manager)
+    for job in IT_JOBS:
+        for experience in EXPERIENCE_LEVELS:
+            job_title = f"{experience} {job}"
+            reed_co_uk.set_salaries_stats(job_title)
+
+
 def find_work_run():
     """
     Collects and stores the number of job offers from FindWork for IT jobs at various experience levels.
@@ -46,13 +60,12 @@ def find_work_run():
             find_work.set_number_offers(position)
 
 
-def reed_co_uk_run():
+def the_muse_run():
     """
-    Collects and stores salary statistics from Reed.co.uk for IT jobs at various experience levels.
+    Collects and stores the number of job offers from The Muse for IT jobs at various experience levels.
     """
-    job_statistics_manager = JobStatisticsManager(GOOGLE_DRIVE_MANAGER, REED_CO_UK)
-    reed_co_uk = ReedCoUk(job_statistics_manager)
+    job_statistics_manager = JobStatisticsManager(GOOGLE_DRIVE_MANAGER, THE_MUSE)
+    the_muse = TheMuse(job_statistics_manager)
     for job in IT_JOBS:
         for experience in EXPERIENCE_LEVELS:
-            job_title = f"{experience} {job}"
-            reed_co_uk.set_salaries_stats(job_title)
+            the_muse.set_number_offers(job, experience)

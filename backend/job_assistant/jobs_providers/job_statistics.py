@@ -87,7 +87,7 @@ class JobStatisticsManager:
 
         if self.api_name not in json_data[date]:
             json_data[date][self.api_name] = {}
-        else:
+        if job_title in json_data[date][self.api_name]:
             LOGGER.info(
                 f"Salaries statistics already saved for API: {self.api_name} on {date}"
             )
@@ -129,13 +129,14 @@ class JobStatisticsManager:
             json_data[date] = {}
         if self.api_name not in json_data[date]:
             json_data[date][self.api_name] = {}
-        else:
+        if job_title in json_data[date][self.api_name]:
             LOGGER.info(
                 f"Number offers for {job_title} already saved for API: {self.api_name} on {date}"
             )
             print(
                 f"{Fore.YELLOW}Number offers for {job_title} already saved for API: {self.api_name} on {date}"
             )
+            print(json_data)
             return
 
         json_data[date][self.api_name][job_title] = number_offers
