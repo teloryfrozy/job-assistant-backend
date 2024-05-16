@@ -10,36 +10,31 @@ Important informations:
 
 import requests
 from backend.job_assistant.constants import FINDWORK_SECRET_KEY
+from backend.job_assistant.jobs_providers.job_statistics import JobStatisticsManager
 
 API_URL = "https://findwork.dev/api/jobs/"
 
 
 class FindWork:
-    def __init__(self) -> None:
+    def __init__(self, job_statistics_manager: JobStatisticsManager) -> None:
         self.headers = {"Authorization": f"Token {FINDWORK_SECRET_KEY}"}
+        self.job_statistics_manager = job_statistics_manager
 
-    def set_number_offers(self, position: str):
+    def set_number_offers(self, job_title: str):
         """
-        Saves the number of ads for a particular job position.
+        Saves the number of ads for a particular job_title.
         """
 
-        url = f"{API_URL}?search={position}"
+        url = f"{API_URL}?search={job_title}"
 
         response = requests.get(url, headers=self.headers)
         if response.status_code == 200:
             data = response.json()
-            total_result = data["count"]
-            print(f"There are {total_result} results for position {position}")
+            number_offers = data["count"]
+            print(f"There are {number_offers} results for position {job_title}")
 
 
-            # IN A FILE ONLY FOR NUMBER OF JOBS RESULTS (STATS_NUMBER_OFFERS_FILE_ID)
-            {
-                "05/16/2024": {
-                    "FindWork": {
-                        position: total_result
-                    }
-                }
-            }
+            self.job_statistics_manager.store_number_offers(job_title, number_offers)
 
             # TODO: save in gdrive
             # TODO: add color logging print

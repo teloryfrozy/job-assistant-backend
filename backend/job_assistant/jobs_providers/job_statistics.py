@@ -16,7 +16,10 @@ from scipy import stats
 from colorama import Fore, init
 import logging
 from backend.job_assistant.gdrive import GoogleDriveManager
-from backend.job_assistant.constants import STATS_SALARIES_FILE_ID
+from backend.job_assistant.constants import (
+    STATS_NUMBER_OFFERS_FILE_ID,
+    STATS_SALARIES_FILE_ID,
+)
 
 LOGGER = logging.getLogger(__name__)
 init(autoreset=True)
@@ -66,7 +69,7 @@ class JobStatisticsManager:
             json_data[date][self.api_name] = {}
         else:
             LOGGER.info(
-                f"Salaries stats already saved for API: {self.api_name} on {date}"
+                f"Salaries statistics already saved for API: {self.api_name} on {date}"
             )
             return
 
@@ -84,8 +87,44 @@ class JobStatisticsManager:
 
         json_data[date][self.api_name][job_title] = stats_data
         self.gdrive_manager.overwrite_json_file(json_data, STATS_SALARIES_FILE_ID)
-        LOGGER.info(f"{Fore.GREEN}Statistics stored for {job_title}: {stats_data}")
+        LOGGER.info(
+            f"{Fore.GREEN}Salaries statistics stored for {job_title} for API: {self.api_name} on {date}"
+        )
 
+        # just for debug => to remove
         print("--------- FILE DATA AFTER UPDATE ------")
         file_data = self.gdrive_manager.read_json_file(STATS_SALARIES_FILE_ID)
+        print(json.dumps(file_data[date], indent=4))
+
+    def store_number_offers(self, job_title: str, number_offers: int) -> None:
+        """
+        Stores the number of job offers for a given job title on the current date, associated with a specific API.
+
+        Args:
+            job_title (str): The job title for which the number of offers is being recorded.
+            number_offers (int): The number of offers to record.
+        """
+        json_data = self.gdrive_manager.read_json_file(STATS_NUMBER_OFFERS_FILE_ID)
+        date = datetime.datetime.now().strftime("%Y-%m-%d")
+
+        if date not in json_data:
+            json_data[date] = {}
+        if self.api_name not in json_data[date]:
+            json_data[date][self.api_name] = {}
+        else:
+            LOGGER.info(
+                f"{Fore.YELLOW}Number offers for {job_title} already saved for API: {self.api_name} on {date}"
+            )
+            return
+
+        json_data[date][self.api_name][job_title] = number_offers
+
+        self.gdrive_manager.overwrite_json_file(json_data, STATS_NUMBER_OFFERS_FILE_ID)
+        LOGGER.info(
+            f"{Fore.GREEN}Number offers for {job_title} stored successfully for API: {self.api_name} on {date}"
+        )
+
+        # just for debug => to remove
+        print("--------- FILE DATA AFTER UPDATE ------")
+        file_data = self.gdrive_manager.read_json_file(STATS_NUMBER_OFFERS_FILE_ID)
         print(json.dumps(file_data[date], indent=4))

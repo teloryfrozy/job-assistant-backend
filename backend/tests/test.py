@@ -32,11 +32,6 @@ GOOGLE_DRIVE_MANAGER = GoogleDriveManager()
 from backend.core.cron import adzuna_run, reed_co_uk_run
 
 
-id = GOOGLE_DRIVE_MANAGER.create_json_file("stats_number_offers.json", {})
-print(id)
-
-
-
 # reed_co_uk_run()
 
 
