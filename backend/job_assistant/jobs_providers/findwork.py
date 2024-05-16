@@ -1,18 +1,14 @@
 """
-TODO: one line clean doc about this API
+FindWork API Interaction Module
 
+This module is designed to interact with the FindWork API to fetch and analyze job salary data.
+Documentation: https://findwork.dev/developers/
 
-# DOC: https://findwork.dev/developers/
-
-# ONLY FOR JOB SEARCH - NO SALARY PROVIDED => can still be used for stats
+Important informations:
+    - NO SALARY DATA PROVIDED
 """
 
-import sys
-import os
 import requests
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
-
 from backend.job_assistant.constants import FINDWORK_SECRET_KEY
 
 API_URL = "https://findwork.dev/api/jobs/"
@@ -22,7 +18,7 @@ class FindWork:
     def __init__(self) -> None:
         self.headers = {"Authorization": f"Token {FINDWORK_SECRET_KEY}"}
 
-    def set_total_results(self, position: str):
+    def set_number_offers(self, position: str):
         """
         Saves the number of ads for a particular job position.
         """
@@ -34,6 +30,16 @@ class FindWork:
             data = response.json()
             total_result = data["count"]
             print(f"There are {total_result} results for position {position}")
+
+
+            # IN A FILE ONLY FOR NUMBER OF JOBS RESULTS (STATS_NUMBER_OFFERS_FILE_ID)
+            {
+                "05/16/2024": {
+                    "FindWork": {
+                        position: total_result
+                    }
+                }
+            }
 
             # TODO: save in gdrive
             # TODO: add color logging print

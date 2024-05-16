@@ -9,10 +9,13 @@ THIS file is just for testing purpose to avoid the hassle of imports
 
 import json
 
-
 import sys
 import os
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
+
+from backend.job_assistant.gdrive import GoogleDriveManager
 
 from backend.job_assistant.constants import (
     AWANLLM_SECRET_KEY,
@@ -20,13 +23,21 @@ from backend.job_assistant.constants import (
     FINDWORK_SECRET_KEY,
     IT_JOBS,
     REED_CO_UK_SECRET_KEY,
+    STATS_SALARIES_FILE_ID,
 )
 
 
+GOOGLE_DRIVE_MANAGER = GoogleDriveManager()
 
 from backend.core.cron import adzuna_run, reed_co_uk_run
 
-#reed_co_uk_run()
+
+id = GOOGLE_DRIVE_MANAGER.create_json_file("stats_number_offers.json", {})
+print(id)
+
+
+
+# reed_co_uk_run()
 
 
 # adzuna_run()
@@ -47,59 +58,6 @@ url = "https://www.arbeitnow.com/api/job-board-api"
 url = "https://www.themuse.com/api/public/jobs?category=Accounting&page=1"
 """
 
-
-# THIS CODE IS USED TO SEE HOW DATA LOOKS LIKE WITH REED.CO.UK
-
-"""import requests
-
-# Define the API endpoint URL
-api_url = "https://www.reed.co.uk/api/1.0/search"
-
-# Define your search parameters
-keywords = "Full Stack Developer"
-api_key = REED_CO_UK_SECRET_KEY
-
-# Construct the query parameters
-params = {
-    "fullTime": "true",
-    "keywords": keywords,
-}
-
-# Make the request
-response = requests.get(api_url, params=params, auth=(api_key, ''))
-
-# Check if the request was successful
-if response.status_code == 200:
-    # Extract and print the response data
-    data = response.json()
-
-    countries = ["uk"]
-
-    abs_min_salary = 1_000_000
-    abs_max_salary = 0
-
-    all_salaries = []
-
-    for job in data["results"]:
-        max_salary = job["maximumSalary"]
-        min_salary = job["minimumSalary"]
-        if max_salary is not None and min_salary is not None:
-            # sometimes salary is the pay per day
-            if max_salary > 10_000 and min_salary > 10_000: 
-                all_salaries.append(max_salary)
-                all_salaries.append(min_salary)
-
-                if max_salary > abs_max_salary:
-                    abs_max_salary = max_salary
-                if min_salary < abs_min_salary:
-                    abs_min_salary = min_salary
-            
-   
-    print(json.dumps(data["results"], indent=4))
-else:
-    # Print an error message if the request was not successful
-    print(f"Error: {response.status_code} - {response.reason}")
-"""
 
 # ADZUNA
 # IGNORE THIS FOR NOW

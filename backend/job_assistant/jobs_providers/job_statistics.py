@@ -1,5 +1,12 @@
 """
 This module computes and stores job salary statistics on Google Drive, tailored for different job APIs.
+
+
+
+# TODO
+# also add a doc somewhere to understand what kurtosis and skew means
+# aka: big value = what, small val = what?
+# add on Notion to create an algorithm (later with ML) to interpret these stats values
 """
 
 import datetime

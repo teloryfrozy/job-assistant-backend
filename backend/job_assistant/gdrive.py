@@ -54,6 +54,25 @@ class GoogleDriveManager:
                 files_tree[item["name"]] = item["id"]
         return files_tree
 
+    def get_file_name(self, file_id: str) -> str | None:
+        """
+        Retrieves the name of a file from Google Drive given its file ID.
+
+        Args:
+            file_id (str): The ID of the file on Google Drive.
+
+        Returns:
+            str: The name of the file if found, otherwise None.
+        """
+        try:
+            file: dict = (
+                self.drive_service.files().get(fileId=file_id, fields="name").execute()
+            )
+            return file.get("name")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return None
+
     def delete_file(self, file_id):
         """Delete a file given its ID."""
         try:
@@ -148,7 +167,7 @@ class GoogleDriveManager:
                 mimetype="application/json",
             )
             file_metadata = {"name": file_name, "parents": [parent_id]}
-            file = (
+            file:dict = (
                 self.drive_service.files()
                 .create(body=file_metadata, media_body=media_body, fields="id")
                 .execute()
@@ -183,4 +202,3 @@ class GoogleDriveManager:
         except Exception as e:
             print(f"An error occurred while updating the JSON file: {e}")
             return None
-

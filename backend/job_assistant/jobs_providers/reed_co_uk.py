@@ -1,14 +1,8 @@
 """
+Reed.co.uk API Interaction Module
 
-TODO: clean file header description
-
-
-Reed.co.uk API calls
-
-DOCUMENTATION
-https://www.reed.co.uk/developers/jobseeker
-
-
+This module is designed to interact with the Reed.co.uk API to fetch and analyze job salary data.
+Documentation: https://www.reed.co.uk/developers/jobseeker
 """
 
 import logging

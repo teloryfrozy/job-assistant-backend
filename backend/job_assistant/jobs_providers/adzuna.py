@@ -1,23 +1,14 @@
 """
-Handles API calls to Adzuna API
+Adzuna API Interaction Module
 
-The clarity of the code will be improved later on. For now just write request.
-We will figure out how to organize it properly on time.
-
-
-TODO: check currency (very very likely to be GBP)
-
-
-
-        # also add a doc somewhere to understand what kurtosis and skew means
-        # aka: big value = what, small val = what?
-        # add on Notion to create an algorithm (later with ML) to interpret these stats values
+This module is designed to interact with the Adzuna API to fetch and analyze job salary data.
+Documentation: https://developer.adzuna.com/overview
 """
 
 import logging
 import requests
 from backend.job_assistant.jobs_providers.job_statistics import JobStatisticsManager
-from ..constants import (
+from backend.job_assistant.constants import (
     ADZUNA_API,
     ADZUNA_APP_ID,
     ADZUNA_SECRET_KEY,
@@ -80,6 +71,8 @@ class Adzuna:
 
     def set_salaries_stats(self, job: str):
         """
+        TODO: (VERY IMPORTANT) check currency (very very likely to be GBP)
+
         Retrieves job statistics including average salary, standard deviation, kurtosis, and skewness
         based on job title and skills.
 

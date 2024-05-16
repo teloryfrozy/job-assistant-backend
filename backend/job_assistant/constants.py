@@ -23,6 +23,7 @@ DJANGO_SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 JSON_KEY_FILE = root / "gdrive_creds.json"
 SCOPES = ["https://www.googleapis.com/auth/drive"]
 STATS_SALARIES_FILE_ID = os.getenv("STATS_SALARIES_FILE_ID")
+STATS_NUMBER_OFFERS_FILE_ID = os.getenv("STATS_NUMBER_OFFERS_FILE_ID")
 
 
 # Job templates / typical jobs
