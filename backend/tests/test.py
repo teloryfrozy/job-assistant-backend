@@ -34,24 +34,9 @@ GOOGLE_DRIVE_MANAGER = GoogleDriveManager()
 from backend.core.cron import adzuna_run, reed_co_uk_run, find_work_run, the_muse_run
 
 # find_work_run()
-the_muse_run()
+# the_muse_run()
 # reed_co_uk_run()
 # adzuna_run()
-
-
-
-url = "https://www.themuse.com/api/search-renderer/jobs?ctsEnabled=true&query=Full Stack Developer&level=internship,entry,mid,senior,management&category=software_engineering,computer_it&posted_date_range=last_30d"
-
-
-response = requests.get(url)
-if response.status_code == 200:
-    data = response.json()
-    number_offers = data["count"]
-    print(number_offers)
-else:
-    # TODO: LOGGER.ERROR
-    print(f"Error: {response.status_code} - {response.reason}")
-
 
 
 # ADZUNA

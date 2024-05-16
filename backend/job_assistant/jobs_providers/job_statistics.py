@@ -30,7 +30,6 @@ Statistical Concepts:
 """
 
 import datetime
-import json
 import numpy as np
 from scipy import stats
 from colorama import Fore, init
@@ -136,7 +135,6 @@ class JobStatisticsManager:
             print(
                 f"{Fore.YELLOW}Number offers for {job_title} already saved for API: {self.api_name} on {date}"
             )
-            print(json_data)
             return
 
         json_data[date][self.api_name][job_title] = number_offers
