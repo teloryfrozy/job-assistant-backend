@@ -29,12 +29,10 @@ from backend.job_assistant.constants import (
 
 GOOGLE_DRIVE_MANAGER = GoogleDriveManager()
 
-from backend.core.cron import adzuna_run, reed_co_uk_run
+from backend.core.cron import adzuna_run, reed_co_uk_run, find_work_run
 
-
+# find_work_run()
 # reed_co_uk_run()
-
-
 # adzuna_run()
 
 

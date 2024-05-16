@@ -24,20 +24,14 @@ class FindWork:
         """
         Saves the number of ads for a particular job_title.
         """
-
-        url = f"{API_URL}?search={job_title}"
+        job_title_search = job_title.replace(" ", "+")
+        url = f"{API_URL}?search={job_title_search}"
 
         response = requests.get(url, headers=self.headers)
         if response.status_code == 200:
             data = response.json()
             number_offers = data["count"]
-            print(f"There are {number_offers} results for position {job_title}")
-
-
             self.job_statistics_manager.store_number_offers(job_title, number_offers)
-
-            # TODO: save in gdrive
-            # TODO: add color logging print
 
         else:
             print(f"Error: {response.status_code} - {response.reason}")

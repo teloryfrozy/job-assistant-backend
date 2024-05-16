@@ -1,26 +1,31 @@
 """
-Scheduled task of Job Assistant
-"""
+Scheduled Task of Job Assistant
 
-import sys
-import os
+This module is designed to interact with various job providers to collect and analyze job market data.
+It utilizes specific classes for different job providers to fetch data related to IT jobs and their respective salaries
+and number of offers based on experience levels. The collected data is managed and stored using Google Drive.
+"""
 
 from backend.job_assistant.gdrive import GoogleDriveManager
 from backend.job_assistant.jobs_providers.job_statistics import JobStatisticsManager
 from backend.job_assistant.jobs_providers.reed_co_uk import ReedCoUk
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
-
 from backend.job_assistant.jobs_providers.adzuna import Adzuna
 from backend.job_assistant.jobs_providers.findwork import FindWork
-from backend.job_assistant.constants import ADZUNA, IT_JOBS, EXPERIENCE_LEVELS, REED_CO_UK
+from backend.job_assistant.constants import (
+    ADZUNA,
+    FINDWORK,
+    IT_JOBS,
+    EXPERIENCE_LEVELS,
+    REED_CO_UK,
+)
 
 GOOGLE_DRIVE_MANAGER = GoogleDriveManager()
 
 
 def adzuna_run():
-    """Scan salaries data and save them for analytical purposes."""
-
+    """
+    Collects and stores salary statistics from Adzuna for IT jobs at various experience levels
+    """
     job_statistics_manager = JobStatisticsManager(GOOGLE_DRIVE_MANAGER, ADZUNA)
     adzuna = Adzuna(job_statistics_manager)
     for job in IT_JOBS:
@@ -30,26 +35,24 @@ def adzuna_run():
 
 
 def find_work_run():
-    """TODO: clean doc as a senior Python dev"""
-
-    find_work = FindWork()
+    """
+    Collects and stores the number of job offers from FindWork for IT jobs at various experience levels.
+    """
+    job_statistics_manager = JobStatisticsManager(GOOGLE_DRIVE_MANAGER, FINDWORK)
+    find_work = FindWork(job_statistics_manager)
     for job in IT_JOBS:
         for experience in EXPERIENCE_LEVELS:
-            position = f"{experience} {job}".replace(" ", "+")
-            find_work.set_total_results(position)
+            position = f"{experience} {job}"
+            find_work.set_number_offers(position)
 
 
 def reed_co_uk_run():
-    """TODO: clean doc as a senior Python dev"""
-
+    """
+    Collects and stores salary statistics from Reed.co.uk for IT jobs at various experience levels.
+    """
     job_statistics_manager = JobStatisticsManager(GOOGLE_DRIVE_MANAGER, REED_CO_UK)
     reed_co_uk = ReedCoUk(job_statistics_manager)
     for job in IT_JOBS:
         for experience in EXPERIENCE_LEVELS:
             job_title = f"{experience} {job}"
             reed_co_uk.set_salaries_stats(job_title)
-
-
-def test_run():
-    for i in range(10):
-        print(f"Test n°{i}")

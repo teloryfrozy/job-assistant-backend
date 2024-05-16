@@ -1,11 +1,31 @@
 """
 This module computes and stores job salary statistics on Google Drive, tailored for different job APIs.
 
+Statistical Concepts:
+    Kurtosis:
+        - Measures the "tailedness" of the data distribution.
+        - High kurtosis: Sharp peak, heavy tails (more outliers).
+        - Low kurtosis: Flatter peak, light tails (fewer outliers).
+
+    Skewness:
+        - Measures the asymmetry of the data distribution.
+        - Positive skew: Longer/fatter tail on the right side (data spread more to the right).
+        - Negative skew: Longer/fatter tail on the left side (data spread more to the left).
+    
+    SIMPLIFIED
+        Kurtosis:
+        Think of kurtosis as a way to measure how pointy or flat the top of a data graph is. 
+        If the kurtosis is high, the graph has a sharp peak and long tails, meaning it has more extreme values. 
+        If it's low, the graph is flatter at the top and doesn't have extreme values sticking out.
+
+        Skewness:
+        Skewness tells us if the data is tilted to one side. If skewness is positive, 
+        the graph stretches more towards the right, showing more data on that side.
+        If it's negative, it stretches more to the left. This helps us see if the data is evenly spread or if 
+        it leans more one way.
 
 
 # TODO
-# also add a doc somewhere to understand what kurtosis and skew means
-# aka: big value = what, small val = what?
 # add on Notion to create an algorithm (later with ML) to interpret these stats values
 """
 
@@ -71,6 +91,9 @@ class JobStatisticsManager:
             LOGGER.info(
                 f"Salaries statistics already saved for API: {self.api_name} on {date}"
             )
+            print(
+                f"{Fore.YELLOW}Salaries statistics already saved for API: {self.api_name} on {date}"
+            )
             return
 
         stats_data = {
@@ -91,11 +114,6 @@ class JobStatisticsManager:
             f"{Fore.GREEN}Salaries statistics stored for {job_title} for API: {self.api_name} on {date}"
         )
 
-        # just for debug => to remove
-        print("--------- FILE DATA AFTER UPDATE ------")
-        file_data = self.gdrive_manager.read_json_file(STATS_SALARIES_FILE_ID)
-        print(json.dumps(file_data[date], indent=4))
-
     def store_number_offers(self, job_title: str, number_offers: int) -> None:
         """
         Stores the number of job offers for a given job title on the current date, associated with a specific API.
@@ -113,6 +131,9 @@ class JobStatisticsManager:
             json_data[date][self.api_name] = {}
         else:
             LOGGER.info(
+                f"Number offers for {job_title} already saved for API: {self.api_name} on {date}"
+            )
+            print(
                 f"{Fore.YELLOW}Number offers for {job_title} already saved for API: {self.api_name} on {date}"
             )
             return
@@ -123,8 +144,3 @@ class JobStatisticsManager:
         LOGGER.info(
             f"{Fore.GREEN}Number offers for {job_title} stored successfully for API: {self.api_name} on {date}"
         )
-
-        # just for debug => to remove
-        print("--------- FILE DATA AFTER UPDATE ------")
-        file_data = self.gdrive_manager.read_json_file(STATS_NUMBER_OFFERS_FILE_ID)
-        print(json.dumps(file_data[date], indent=4))
