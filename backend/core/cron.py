@@ -34,6 +34,17 @@ def adzuna_run():
         for experience in EXPERIENCE_LEVELS:
             job_title = f"{experience} {job}"
             adzuna.set_salaries_stats(job_title)
+            # TODO: define when the cron should be run
+            adzuna.set_number_offers(
+                country="fr",
+                params={
+                    "max_days_old": 7,
+                    "what_and": experience,
+                    "title_only": job,
+                    "full_time": 1,
+                    "permanent": 1,
+                },
+            )
 
 
 def reed_co_uk_run():

@@ -2,11 +2,6 @@
 THIS file is just for testing purpose to avoid the hassle of imports
 """
 
-# VERY IMPORTANT
-# https://developers.greenhouse.io/job-board.html#submit-an-application
-# => submit via an API
-
-
 import json
 
 import sys
@@ -16,10 +11,14 @@ import requests
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
+from backend.job_assistant.jobs_providers.adzuna import Adzuna
+from backend.job_assistant.jobs_providers.job_statistics import JobStatisticsManager
+
 
 from backend.job_assistant.gdrive import GoogleDriveManager
 
 from backend.job_assistant.constants import (
+    ADZUNA,
     AWANLLM_SECRET_KEY,
     EXPERIENCE_LEVELS,
     FINDWORK_SECRET_KEY,
@@ -41,28 +40,6 @@ from backend.core.cron import adzuna_run, reed_co_uk_run, find_work_run, the_mus
 
 # ADZUNA
 # IGNORE THIS FOR NOW
-"""
-results = Request.get_jobs(
-    country="gb",
-    params={
-        "results_per_page": 20,
-        "what": "javascript developer",
-        "what_exclude": "java",
-        "where": "london",
-        "sort_by": "salary",
-        "salary_min": 30000,
-        "full_time": 1,
-        "permanent": 1,
-    },
-    nb_pages=2,
-)
-"""
-
-
-# for json_data in results:
-#     print(json.dumps(json_data, indent=4))
-
-
 """response = Request.get_jobs(
     country="gb",
     params={

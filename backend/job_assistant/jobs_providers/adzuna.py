@@ -71,7 +71,7 @@ class Adzuna:
 
     def set_salaries_stats(self, job: str):
         """
-        TODO: (VERY IMPORTANT) check currency (very very likely to be GBP)
+        TODO: Add currency on gdrive: GBP
 
         Retrieves job statistics including average salary, standard deviation, kurtosis, and skewness
         based on job title and skills.
@@ -124,8 +124,35 @@ class Adzuna:
         if all_salaries:
             self.job_statistics_manager.store_salaries_statistics(job, all_salaries)
 
-    @staticmethod
-    def get_jobs(country: str, params: dict, nb_pages: int = 20) -> list:
+    def set_number_offers(
+        self,
+        country: str,
+        params: dict,
+    ):
+        """
+        Fetches and stores the number of job offers available for a specified country from the Adzuna API.
+
+        Parameters:
+            - country (str): The country for which job offers are being queried.
+            - params (dict): A dictionary of parameters to modify the API request.
+        """
+        params = self.get_params(params)
+        url = f"{ADZUNA_API}jobs/{country}/search/1"
+        response = requests.get(url, params=params)
+
+        if response.status_code == 200:
+            number_offers = response.json()["count"]
+            self.job_statistics_manager.store_number_offers(
+                params["title_only"], number_offers
+            )
+        else:
+            error_msg = f"Failed to fetch jobs data from URL: {url}. "
+            error_msg += (
+                f"Status code: {response.status_code}, Reason: {response.reason}"
+            )
+            LOGGER.error(error_msg)
+
+    def get_jobs(self, country: str, params: dict, nb_pages: int = 20) -> list:
         """
         Fetches job data from the Adzuna API.
 
@@ -137,7 +164,7 @@ class Adzuna:
         Returns:
             list: List of job data.
         """
-        params = Adzuna().get_params(params)
+        params = self.get_params(params)
         data = []
 
         for i in range(1, nb_pages + 1):
