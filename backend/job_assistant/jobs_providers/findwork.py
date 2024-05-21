@@ -16,6 +16,8 @@ from backend.job_assistant.jobs_providers.job_statistics import JobStatisticsMan
 ######################## LOGGING CONFIGURATION ########################
 LOGGER = logging.getLogger(__name__)
 API_URL = "https://findwork.dev/api/jobs/"
+RESULTS_PER_PAGE = 100
+
 
 class FindWork:
     def __init__(self, job_statistics_manager: JobStatisticsManager) -> None:
@@ -46,3 +48,78 @@ class FindWork:
         else:
             # TODO: LOGGER.ERROR
             print(f"Error: {response.status_code} - {response.reason}")
+
+    def get_jobs(self, params: dict) -> dict[str, list] | str:
+        """
+        Fetches job data from the Adzuna API.
+
+        Args:
+            country (str): Country code.
+            params (dict): Dictionary of request parameters.
+            nb_pages (int, optional): Number of pages to fetch. Defaults to 20.
+
+        Returns:
+            list: List of job data.
+        """
+        data = {}
+        params = {"employment_type": "full time", "page": 1}
+
+        response = requests.get(API_URL, headers=self.headers, params=params)
+        if response.status_code != 200:
+            # TODO: clean logging
+            error_msg = (
+                f"Status code: {response.status_code}, Reason: {response.reason}"
+            )
+            LOGGER.error(error_msg)
+            return error_msg + "There was an error please display something to the user"
+
+        json_data: dict = response.json()
+        number_offers = json_data["count"]
+        data["number_offers"] = number_offers
+        data["results"] = []
+
+        if number_offers < 100:
+            json_data: dict = response.json()
+            results: dict = json_data["results"]
+
+            # TODO: add a streaming to see a progress bar in FE
+            for result in results:
+                job_info = {
+                    "title": result["role"],
+                    "location": result["location"],
+                    "keywords": result["keywords"],
+                    "company": result["company_name"],
+                    "url": result["url"],
+                    "date_posted": result["date_posted"],
+                }
+                data["results"].append(job_info)
+        else:
+            nb_pages = number_offers // RESULTS_PER_PAGE
+            if number_offers % RESULTS_PER_PAGE > 0:
+                nb_pages += 1
+
+            for i in range(2, nb_pages + 1):
+                response = requests.get(API_URL, headers=self.headers, params=params)
+
+                if response.status_code != 200:
+                    # TODO: clean logging
+                    error_msg = f"PAGE: {i}, Status code: {response.status_code}, Reason: {response.reason}"
+                    LOGGER.error(error_msg)
+                    return error_msg + "There was an error please display something to the user"
+
+                json_data: dict = response.json()
+                results: dict = json_data["results"]
+
+                # TODO: add a streaming to see a progress bar in FE
+                for result in results:
+                    job_info = {
+                        "title": result["role"],
+                        "location": result["location"],
+                        "keywords": result["keywords"],
+                        "company": result["company_name"],
+                        "url": result["url"],
+                        "date_posted": result["date_posted"],
+                    }
+                    data["results"].append(job_info)
+
+        return data

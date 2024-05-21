@@ -20,7 +20,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 CUSTOM_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 SECRET_KEY = DJANGO_SECRET_KEY
 BACKEND_LOG_PATH = "backend.log"
-BACKEND_JSON_LOG = "logger.json"
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
@@ -69,7 +68,7 @@ LOGGING = {
         },
         "file": {
             "class": "logging.FileHandler",
-            "filename": BACKEND_JSON_LOG,
+            "filename": BACKEND_LOG_PATH,
             "level": "ERROR",
             "formatter": "json",
         },
@@ -174,12 +173,13 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # under developement (do not delete)
 # visual tool: https://crontab.guru/
 
+
 # if someone smart can debug this import issue 🤪🤔
 def dummy_task():
     print("Hello from dummy task!")
-CRONJOBS = [
-    ("*/1 * * * *", "settings.dummy_task")
-]
 
-    #("0 3 * * SUN", "backend.core.cron.adzuna_run"),  # At 03:00 on Sunday
-    #("*/1 * * * *", "backend.core.cron.test_run"),
+
+CRONJOBS = [("*/1 * * * *", "settings.dummy_task")]
+
+# ("0 3 * * SUN", "backend.core.cron.adzuna_run"),  # At 03:00 on Sunday
+# ("*/1 * * * *", "backend.core.cron.test_run"),
