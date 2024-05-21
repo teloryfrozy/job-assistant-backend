@@ -5,7 +5,9 @@ This module is designed to interact with the Adzuna API to fetch and analyze job
 Documentation: https://developer.adzuna.com/overview
 """
 
+import json
 import logging
+import time
 import requests
 from backend.job_assistant.jobs_providers.job_statistics import JobStatisticsManager
 from backend.job_assistant.constants import (
@@ -172,7 +174,23 @@ class Adzuna:
             response = requests.get(url, params=params)
 
             if response.status_code == 200:
-                data.append(response.json())
+                json_data: dict = response.json()
+                results: dict[dict] = json_data["results"]
+
+                # TODO: add a streaming to see a progress bar in FE
+                for result in results:
+                    print(result["salary_max"])
+                    job_info = {
+                        "title": result["title"],
+                        "min_salary": result.get("salary_min"),
+                        "max_salary": result.get("salary_max"),
+                        "location": result["location"]["display_name"],
+                        "category": result["category"]["label"],
+                        "company": result["company"]["display_name"],
+                        "url": result["redirect_url"],
+                        "date_posted": result["created"],
+                    }
+                    data.append(job_info)
             else:
                 error_msg = f"Failed to fetch jobs data from URL: {url}. "
                 error_msg += (
