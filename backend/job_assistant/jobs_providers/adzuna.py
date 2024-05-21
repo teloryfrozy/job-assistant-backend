@@ -16,6 +16,7 @@ from backend.job_assistant.constants import (
     ADZUNA_SECRET_KEY,
 )
 
+RESULTS_PER_PAGE = 50
 # TODO: check if we can get job offers with all extensions
 ADZUNA_COUNTRY_EXTENSIONS = [
     "gb",
@@ -167,50 +168,77 @@ class Adzuna:
             list: List of job data.
         """
         params = self.get_params(params)
+        params["results_per_page"] = RESULTS_PER_PAGE
+
         data = {}
         data["results"] = []
-        #number_offers = 
 
         url = f"{ADZUNA_API}jobs/{country}/search/{1}?"
         response = requests.get(url, params=params)
 
-        if response.status_code == 200:
+        if response.status_code != 200:
+            # TODO: clean logging
+            error_msg = (
+                f"Status code: {response.status_code}, Reason: {response.reason}"
+            )
+            LOGGER.error(error_msg)
+            return error_msg + "There was an error please display something to the user"
+
+        json_data: dict = response.json()
+        number_offers = json_data["count"]
+        data["number_offers"] = number_offers
+        data["results"] = []
+
+        if number_offers < 100:
             json_data: dict = response.json()
-            results: dict[dict] = json_data["results"]
-            print(f'threr are {len(json_data)} results per page')
+            results: dict = json_data["results"]
 
+            # TODO: add a streaming to see a progress bar in FE
+            for result in results:
+                job_info = {
+                    "title": result["title"],
+                    "min_salary": result.get("salary_min"),
+                    "max_salary": result.get("salary_max"),
+                    "location": result["location"]["display_name"],
+                    "category": result["category"]["label"],
+                    "company": result["company"]["display_name"],
+                    "url": result["redirect_url"],
+                    "date_posted": result["created"],
+                }
+                data["results"].append(job_info)
+        else:
+            nb_pages = number_offers // RESULTS_PER_PAGE
+            if number_offers % RESULTS_PER_PAGE > 0:
+                nb_pages += 1
 
+            for i in range(2, nb_pages + 1):
+                url = f"{ADZUNA_API}jobs/{country}/search/{i}?"
+                response = requests.get(url, params=params)
 
+                if response.status_code != 200:
+                    # TODO: clean logging
+                    error_msg = f"PAGE: {i}, Status code: {response.status_code}, Reason: {response.reason}"
+                    LOGGER.error(error_msg)
+                    return (
+                        error_msg
+                        + "There was an error please display something to the user"
+                    )
 
-        # for i in range(1, nb_pages + 1):
-        #     url = f"{ADZUNA_API}jobs/{country}/search/{i}?"
-        #     response = requests.get(url, params=params)
+                json_data: dict = response.json()
+                results: dict[dict] = json_data["results"]
 
-        #     if response.status_code == 200:
-        #         json_data: dict = response.json()
-        #         results: dict[dict] = json_data["results"]
-        #         print(f'threr are {len(json_data)} results per page')
+                # TODO: add a streaming to see a progress bar in FE
+                for result in results:
+                    job_info = {
+                        "title": result["title"],
+                        "min_salary": result.get("salary_min"),
+                        "max_salary": result.get("salary_max"),
+                        "location": result["location"]["display_name"],
+                        "category": result["category"]["label"],
+                        "company": result["company"].get("display_name"),
+                        "url": result["redirect_url"],
+                        "date_posted": result["created"],
+                    }
+                    data["results"].append(job_info)
 
-        #         # TODO: add a streaming to see a progress bar in FE
-        #         for result in results:
-        #             job_info = {
-        #                 "title": result["title"],
-        #                 "min_salary": result.get("salary_min"),
-        #                 "max_salary": result.get("salary_max"),
-        #                 "location": result["location"]["display_name"],
-        #                 "category": result["category"]["label"],
-        #                 "company": result["company"]["display_name"],
-        #                 "url": result["redirect_url"],
-        #                 "date_posted": result["created"],
-        #             }
-        #             data["results"].append(job_info)
-        #     else:
-        #         error_msg = f"Failed to fetch jobs data from URL: {url}. "
-        #         error_msg += (
-        #             f"Status code: {response.status_code}, Reason: {response.reason}"
-        #         )
-        #         LOGGER.error(error_msg)
-        #         return data
-        # # TODO logic to get nb offers
-        # #data["number_offers"] = number_offers
         return data

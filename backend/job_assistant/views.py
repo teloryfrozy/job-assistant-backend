@@ -41,13 +41,11 @@ def get_jobs(request: HttpRequest):
     max_salary: int = parameters.get("max_salary")
     full_time: bool = parameters.get("full_time")
     permanent: bool = parameters.get("permanent")
-    remote: bool =parameters.get("remote")
+    remote: bool = parameters.get("remote")
     number_offers: int = parameters.get(
         "numberOffers"
     )  # just to be quicker if poor connection
 
-
-    
     jobs_offers = {}
     # TODO get all params and redirect to the correct APIs providers
 
@@ -58,16 +56,14 @@ def get_jobs(request: HttpRequest):
         # no need to recreate a JobStatisticsManager => just change the api_name for logging purposes
         job_statistics_manager = JobStatisticsManager(GOOGLE_DRIVE_MANAGER, ADZUNA)
 
-
         params = {
             "what": job_title,
-            "where": location,
+            # "where": location,
             "sort_by": "salary",
             "salary_min": min_salary,
             "full_time": 1,
             "permanent": 1,
         }
-
 
         adzuna = Adzuna(job_statistics_manager)
         adzuna_job_offers = adzuna.get_jobs("gb", params)
@@ -77,15 +73,12 @@ def get_jobs(request: HttpRequest):
 
     if FINDWORK in jobs_providers:
 
-        
         GOOGLE_DRIVE_MANAGER = GoogleDriveManager()
         job_statistics_manager = JobStatisticsManager(GOOGLE_DRIVE_MANAGER, FINDWORK)
 
-
         # no need to recreate a JobStatisticsManager => just change the api_name for logging purposes
-        #job_statistics_manager.api_name = FINDWORK
+        # job_statistics_manager.api_name = FINDWORK
         find_work = FindWork(job_statistics_manager)
-
 
         params = {
             "employment_type": "full time",
@@ -96,6 +89,5 @@ def get_jobs(request: HttpRequest):
 
         find_work_job_offers = find_work.get_jobs(params)
         jobs_offers[FINDWORK] = find_work_job_offers
-
 
     return JsonResponse({"offers": jobs_offers}, status=status.HTTP_200_OK)

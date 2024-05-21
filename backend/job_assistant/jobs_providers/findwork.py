@@ -105,7 +105,10 @@ class FindWork:
                     # TODO: clean logging
                     error_msg = f"PAGE: {i}, Status code: {response.status_code}, Reason: {response.reason}"
                     LOGGER.error(error_msg)
-                    return error_msg + "There was an error please display something to the user"
+                    return (
+                        error_msg
+                        + "There was an error please display something to the user"
+                    )
 
                 json_data: dict = response.json()
                 results: dict = json_data["results"]
