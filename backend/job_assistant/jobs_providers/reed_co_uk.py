@@ -15,6 +15,8 @@ from backend.job_assistant.constants import REED_CO_UK_SECRET_KEY
 LOGGER = logging.getLogger(__name__)
 
 
+RESULTS_PER_PAGE = 100
+
 API_URL = "https://www.reed.co.uk/api/1.0/search"
 
 
@@ -85,9 +87,10 @@ class ReedCoUk:
         """
         # TODO: add a streaming with a websocket to see a progress bar in FE
         data = {}
-        
 
-        response = requests.get(API_URL, headers=self.headers, params=params)
+        response = requests.get(
+            API_URL, params=params, auth=(REED_CO_UK_SECRET_KEY, "")
+        )
         if response.status_code != 200:
             # TODO: clean logging
             error_msg = (
@@ -97,24 +100,26 @@ class ReedCoUk:
             return error_msg + "There was an error please display something to the user"
 
         json_data: dict = response.json()
-        number_offers = json_data["count"]
-
-        print(f"----------{number_offers} offfersss!!!!")
+        number_offers = json_data["totalResults"]
         data["number_offers"] = number_offers
         data["results"] = []
 
         if number_offers < 100:
             json_data: dict = response.json()
-            results: dict = json_data["results"]
+            results: dict[dict] = json_data["results"]
 
             for result in results:
                 job_info = {
-                    "title": result["role"],
-                    "location": result["location"],
-                    "keywords": result["keywords"],
-                    "company": result["company_name"],
-                    "url": result["url"],
-                    "date_posted": result["date_posted"],
+                    "title": result["jobTitle"],
+                    "min_salary": result["minimumSalary"],
+                    "max_salary": result["maximumSalary"],
+                    "currency": result["currency"],
+                    "location": result["locationName"],
+                    "company": result["employerName"],
+                    "url": result["jobUrl"],
+                    "date_posted": result["date"],
+                    "expiration_date": result["expirationDate"],
+                    "applications": result["applications"],
                 }
                 data["results"].append(job_info)
         else:
@@ -123,7 +128,9 @@ class ReedCoUk:
                 nb_pages += 1
 
             for i in range(2, nb_pages + 1):
-                response = requests.get(API_URL, headers=self.headers, params=params)
+                response = requests.get(
+                    API_URL, params=params, auth=(REED_CO_UK_SECRET_KEY, "")
+                )
 
                 if response.status_code != 200:
                     # TODO: clean logging
@@ -139,12 +146,16 @@ class ReedCoUk:
 
                 for result in results:
                     job_info = {
-                        "title": result["role"],
-                        "location": result["location"],
-                        "keywords": result["keywords"],
-                        "company": result["company_name"],
-                        "url": result["url"],
-                        "date_posted": result["date_posted"],
+                        "title": result["jobTitle"],
+                        "min_salary": result["minimumSalary"],
+                        "max_salary": result["maximumSalary"],
+                        "currency": result["currency"],
+                        "location": result["locationName"],
+                        "company": result["employerName"],
+                        "url": result["jobUrl"],
+                        "date_posted": result["date"],
+                        "expiration_date": result["expirationDate"],
+                        "applications": result["applications"],
                     }
                     data["results"].append(job_info)
 

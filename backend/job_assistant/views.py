@@ -9,11 +9,12 @@ import logging
 from django.http import HttpRequest, JsonResponse
 from rest_framework.decorators import api_view
 
-from backend.job_assistant.constants import ADZUNA, FINDWORK
+from backend.job_assistant.constants import ADZUNA, FINDWORK, REED_CO_UK
 from backend.job_assistant.gdrive import GoogleDriveManager
 from backend.job_assistant.jobs_providers.adzuna import Adzuna
 from backend.job_assistant.jobs_providers.findwork import FindWork
 from backend.job_assistant.jobs_providers.job_statistics import JobStatisticsManager
+from backend.job_assistant.jobs_providers.reed_co_uk import ReedCoUk
 
 ######################## LOGGING CONFIGURATION ########################
 LOGGER = logging.getLogger(__name__)
@@ -47,39 +48,38 @@ def get_jobs(request: HttpRequest):
     )  # just to be quicker if poor connection
 
     jobs_offers = {}
+
+    GOOGLE_DRIVE_MANAGER = GoogleDriveManager()
+    job_statistics_manager = JobStatisticsManager(GOOGLE_DRIVE_MANAGER, ADZUNA)
+
     # TODO get all params and redirect to the correct APIs providers
 
     ############# ONLY FOR ADZUNA ########################
     if ADZUNA in jobs_providers:
-
-        GOOGLE_DRIVE_MANAGER = GoogleDriveManager()
-        # no need to recreate a JobStatisticsManager => just change the api_name for logging purposes
-        job_statistics_manager = JobStatisticsManager(GOOGLE_DRIVE_MANAGER, ADZUNA)
+        job_statistics_manager.api_name = ADZUNA
+        adzuna = Adzuna(job_statistics_manager)
 
         params = {
             "what": job_title,
-            #"where": city,
-            "sort_by": "salary",
+            # "where": city,
+            # "sort_by": "salary",
             "salary_min": min_salary,
-            "full_time": 1,
-            "permanent": 1,
         }
+        if full_time:
+            params["full_time"] = 1
+        if permanent:
+            params["permanent"] = 1
 
-        adzuna = Adzuna(job_statistics_manager)
         adzuna_job_offers = adzuna.get_jobs(country, params)
         jobs_offers[ADZUNA] = adzuna_job_offers
 
     ####################################################
 
     if FINDWORK in jobs_providers:
-
-        GOOGLE_DRIVE_MANAGER = GoogleDriveManager()
-        job_statistics_manager = JobStatisticsManager(GOOGLE_DRIVE_MANAGER, FINDWORK)
-
-        # no need to recreate a JobStatisticsManager => just change the api_name for logging purposes
-        # job_statistics_manager.api_name = FINDWORK
+        job_statistics_manager.api_name = FINDWORK
         find_work = FindWork(job_statistics_manager)
 
+        # TODO: add clean params instead of hard coding
         params = {
             "employment_type": "full time",
             "remote": "false",
@@ -89,5 +89,19 @@ def get_jobs(request: HttpRequest):
 
         find_work_job_offers = find_work.get_jobs(params)
         jobs_offers[FINDWORK] = find_work_job_offers
+
+    if REED_CO_UK in jobs_providers:
+        job_statistics_manager.api_name = REED_CO_UK
+        reed_co_uk = ReedCoUk(job_statistics_manager)
+
+        params = {
+            "keywords": job_title,
+            "minimumSalary": min_salary,
+            "fullTime": full_time,
+            "locationName": country,
+        }
+
+        reed_co_uk_job_offers = reed_co_uk.get_jobs(params)
+        jobs_offers[REED_CO_UK] = reed_co_uk_job_offers
 
     return JsonResponse({"offers": jobs_offers}, status=status.HTTP_200_OK)
