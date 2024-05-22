@@ -61,6 +61,7 @@ class FindWork:
         Returns:
             list: List of job data.
         """
+        # TODO: add a streaming with a websocket to see a progress bar in FE
         data = {}
         params = {"employment_type": "full time", "page": 1}
 
@@ -82,7 +83,6 @@ class FindWork:
             json_data: dict = response.json()
             results: dict = json_data["results"]
 
-            # TODO: add a streaming to see a progress bar in FE
             for result in results:
                 job_info = {
                     "title": result["role"],
@@ -113,7 +113,6 @@ class FindWork:
                 json_data: dict = response.json()
                 results: dict = json_data["results"]
 
-                # TODO: add a streaming to see a progress bar in FE
                 for result in results:
                     job_info = {
                         "title": result["role"],

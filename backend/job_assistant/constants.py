@@ -39,7 +39,6 @@ IT_JOBS = [
 ######################## JOB OFFERS API ########################
 
 # ----------------------- ADZUNA ----------------------- #
-ADZUNA_API = "https://api.adzuna.com/v1/api/"
 ADZUNA_APP_ID = os.getenv("ADZUNA_APP_ID")
 ADZUNA_SECRET_KEY = os.getenv("ADZUNA_SECRET_KEY")
 ADZUNA = "Adzuna"

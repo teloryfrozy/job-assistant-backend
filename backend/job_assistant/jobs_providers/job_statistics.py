@@ -23,10 +23,6 @@ Statistical Concepts:
         the graph stretches more towards the right, showing more data on that side.
         If it's negative, it stretches more to the left. This helps us see if the data is evenly spread or if 
         it leans more one way.
-
-
-# TODO
-# add on Notion to create an algorithm (later with ML) to interpret these stats values
 """
 
 import datetime

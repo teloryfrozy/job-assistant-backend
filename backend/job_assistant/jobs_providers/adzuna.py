@@ -5,19 +5,14 @@ This module is designed to interact with the Adzuna API to fetch and analyze job
 Documentation: https://developer.adzuna.com/overview
 """
 
-import json
 import logging
-import time
 import requests
 from backend.job_assistant.jobs_providers.job_statistics import JobStatisticsManager
-from backend.job_assistant.constants import (
-    ADZUNA_API,
-    ADZUNA_APP_ID,
-    ADZUNA_SECRET_KEY,
-)
+from backend.job_assistant.constants import ADZUNA_APP_ID, ADZUNA_SECRET_KEY
 
+
+ADZUNA_API = "https://api.adzuna.com/v1/api/"
 RESULTS_PER_PAGE = 50
-# TODO: check if we can get job offers with all extensions
 ADZUNA_COUNTRY_EXTENSIONS = [
     "gb",
     "us",
@@ -48,6 +43,8 @@ LOGGER = logging.getLogger(__name__)
 class Adzuna:
     """
     Class for interacting with the Adzuna API and performing statistical analysis on job salaries.
+
+    # TODO: add def set_number_offers(self, job_title: str) -> None: method
     """
 
     def __init__(self, job_statistics_manager: JobStatisticsManager) -> None:
@@ -155,18 +152,11 @@ class Adzuna:
             )
             LOGGER.error(error_msg)
 
-    def get_jobs(self, country: str, params: dict) -> list:
+    def get_jobs(self, country: str, params: dict) -> dict[str, list] | str:
         """
-        Fetches job data from the Adzuna API.
-
-        Args:
-            country (str): Country code.
-            params (dict): Dictionary of request parameters.
-            nb_pages (int, optional): Number of pages to fetch. Defaults to 20.
-
-        Returns:
-            list: List of job data.
+        TODO: clean doc as a senior backend python developer
         """
+        # TODO: add a streaming with a websocket to see a progress bar in FE
         params = self.get_params(params)
         params["results_per_page"] = RESULTS_PER_PAGE
 
@@ -193,7 +183,6 @@ class Adzuna:
             json_data: dict = response.json()
             results: dict = json_data["results"]
 
-            # TODO: add a streaming to see a progress bar in FE
             for result in results:
                 job_info = {
                     "title": result["title"],
@@ -227,15 +216,15 @@ class Adzuna:
                 json_data: dict = response.json()
                 results: dict[dict] = json_data["results"]
 
-                # TODO: add a streaming to see a progress bar in FE
                 for result in results:
+                    company: dict = result["company"]
                     job_info = {
                         "title": result["title"],
                         "min_salary": result.get("salary_min"),
                         "max_salary": result.get("salary_max"),
                         "location": result["location"]["display_name"],
                         "category": result["category"]["label"],
-                        "company": result["company"].get("display_name"),
+                        "company": company.get("display_name"),
                         "url": result["redirect_url"],
                         "date_posted": result["created"],
                     }

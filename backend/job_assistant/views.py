@@ -58,7 +58,7 @@ def get_jobs(request: HttpRequest):
 
         params = {
             "what": job_title,
-            # "where": location,
+            #"where": city,
             "sort_by": "salary",
             "salary_min": min_salary,
             "full_time": 1,
@@ -66,7 +66,7 @@ def get_jobs(request: HttpRequest):
         }
 
         adzuna = Adzuna(job_statistics_manager)
-        adzuna_job_offers = adzuna.get_jobs("gb", params)
+        adzuna_job_offers = adzuna.get_jobs(country, params)
         jobs_offers[ADZUNA] = adzuna_job_offers
 
     ####################################################

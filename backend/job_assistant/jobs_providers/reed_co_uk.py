@@ -21,6 +21,8 @@ API_URL = "https://www.reed.co.uk/api/1.0/search"
 class ReedCoUk:
     """
     Class for interacting with the Reed CO UK API and performing statistical analysis on job salaries.
+
+    # TODO: add def set_number_offers(self, job_title: str) -> None: method
     """
 
     def __init__(self, job_statistics_manager: JobStatisticsManager) -> None:
@@ -76,3 +78,74 @@ class ReedCoUk:
             LOGGER.error(
                 f"Failed to retrieve data: {response.status_code} - {response.reason}"
             )
+
+    def get_jobs(self, params: dict) -> dict[str, list] | str:
+        """
+        TODO: clean doc as a senior backend python developer
+        """
+        # TODO: add a streaming with a websocket to see a progress bar in FE
+        data = {}
+        
+
+        response = requests.get(API_URL, headers=self.headers, params=params)
+        if response.status_code != 200:
+            # TODO: clean logging
+            error_msg = (
+                f"Status code: {response.status_code}, Reason: {response.reason}"
+            )
+            LOGGER.error(error_msg)
+            return error_msg + "There was an error please display something to the user"
+
+        json_data: dict = response.json()
+        number_offers = json_data["count"]
+
+        print(f"----------{number_offers} offfersss!!!!")
+        data["number_offers"] = number_offers
+        data["results"] = []
+
+        if number_offers < 100:
+            json_data: dict = response.json()
+            results: dict = json_data["results"]
+
+            for result in results:
+                job_info = {
+                    "title": result["role"],
+                    "location": result["location"],
+                    "keywords": result["keywords"],
+                    "company": result["company_name"],
+                    "url": result["url"],
+                    "date_posted": result["date_posted"],
+                }
+                data["results"].append(job_info)
+        else:
+            nb_pages = number_offers // RESULTS_PER_PAGE
+            if number_offers % RESULTS_PER_PAGE > 0:
+                nb_pages += 1
+
+            for i in range(2, nb_pages + 1):
+                response = requests.get(API_URL, headers=self.headers, params=params)
+
+                if response.status_code != 200:
+                    # TODO: clean logging
+                    error_msg = f"PAGE: {i}, Status code: {response.status_code}, Reason: {response.reason}"
+                    LOGGER.error(error_msg)
+                    return (
+                        error_msg
+                        + "There was an error please display something to the user"
+                    )
+
+                json_data: dict = response.json()
+                results: dict = json_data["results"]
+
+                for result in results:
+                    job_info = {
+                        "title": result["role"],
+                        "location": result["location"],
+                        "keywords": result["keywords"],
+                        "company": result["company_name"],
+                        "url": result["url"],
+                        "date_posted": result["date_posted"],
+                    }
+                    data["results"].append(job_info)
+
+        return data
