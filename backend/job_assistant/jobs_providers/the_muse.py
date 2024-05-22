@@ -19,6 +19,9 @@ from backend.job_assistant.jobs_providers.job_statistics import JobStatisticsMan
 logging.basicConfig(level=logging.INFO)
 LOGGER = logging.getLogger(__name__)
 
+API_URL = "https://www.themuse.com/api/public/"
+RESULTS_PER_PAGE = 20
+
 THE_MUSE_LEVELS = {
     "Intern": "internship",
     "Junior": "entry",
@@ -51,12 +54,21 @@ class TheMuse:
             job_title (str): The title of the job to search for.
             experience (str): The experience level of the job (Intern, Junior, Senior).
         """
-
         level = THE_MUSE_LEVELS[experience]
 
-        url = f"https://www.themuse.com/api/search-renderer/jobs?ctsEnabled=true&query={job_title}&level={level}&category=software_engineering,computer_it&posted_date_range=last_30d"
+        url = "https://www.themuse.com/api/search-renderer/jobs"
 
-        response = requests.get(url)
+        # TODO: add more categories according to job title
+        params = {
+            "ctsEnabled": "true",  # essential
+            "query": job_title,
+            "level": level,
+            "category": "software_engineering,computer_it",
+            "posted_date_range": "last_30d",  # essential
+        }
+
+        response = requests.get(url, params=params)
+
         if response.status_code == 200:
             data = response.json()
             number_offers = data["count"]
@@ -65,3 +77,71 @@ class TheMuse:
             LOGGER.error(
                 f"Failed to fetch data from The Muse API: {response.status_code} - {response.reason}"
             )
+
+    def get_jobs(self, params: dict) -> dict[str, list] | str:
+        """
+        TODO: clean doc as a senior backend python developer
+        """
+        # TODO: add a streaming with a websocket to see a progress bar in FE
+        data = {}
+        params["page"] = 1
+        response = requests.get(f"{API_URL}jobs", params=params)
+
+        if response.status_code != 200:
+            # TODO: clean logging
+            error_msg = (
+                f"Status code: {response.status_code}, Reason: {response.reason}"
+            )
+            LOGGER.error(error_msg)
+            return error_msg + "There was an error please display something to the user"
+
+        json_data: dict = response.json()
+        number_offers = json_data["total"] if json_data["results"] != [] else 0
+        data["number_offers"] = number_offers
+        data["results"] = []
+
+        if number_offers < RESULTS_PER_PAGE:
+            json_data: dict = response.json()
+            results: dict[dict] = json_data["results"]
+
+            for result in results:
+                job_info = {
+                    "title": result["name"],
+                    "categories": result.get("categories"),
+                    "location": result["locations"],
+                    "company": result["company"]["name"],
+                    "url": result["refs"]["landing_page"],
+                    "date_posted": result["publication_date"],
+                }
+                data["results"].append(job_info)
+        else:
+            nb_pages = json_data["page_count"]
+
+            for i in range(2, nb_pages + 1):
+                params["page"] = i
+                response = requests.get(f"{API_URL}jobs", params=params)
+
+                if response.status_code != 200:
+                    # TODO: clean logging
+                    error_msg = f"PAGE: {i}, Status code: {response.status_code}, Reason: {response.reason}"
+                    LOGGER.error(error_msg)
+                    return (
+                        error_msg
+                        + "There was an error please display something to the user"
+                    )
+
+                json_data: dict = response.json()
+                results: dict[dict] = json_data["results"]
+
+                for result in results:
+                    job_info = {
+                        "title": result["name"],
+                        "categories": result.get("categories"),
+                        "location": result["locations"],
+                        "company": result["company"]["name"],
+                        "url": result["refs"]["landing_page"],
+                        "date_posted": result["publication_date"],
+                    }
+                    data["results"].append(job_info)
+
+        return data

@@ -79,7 +79,7 @@ class FindWork:
         data["number_offers"] = number_offers
         data["results"] = []
 
-        if number_offers < 100:
+        if number_offers < RESULTS_PER_PAGE:
             json_data: dict = response.json()
             results: dict = json_data["results"]
 
