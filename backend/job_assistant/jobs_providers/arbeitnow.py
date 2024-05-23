@@ -40,10 +40,16 @@ class ArbeitNow:
 
     def get_jobs(self, visa_sponsorship: bool | None) -> dict[str, list] | str:
         """
-        TODO: clean doc as a senior backend python developer
+        TODO: clean the duplicated code with functions
+        ⚠️ I already optimized the dichotomous search and chatGPT does not understand it => Do not touch the LOGIC ⚠️
 
+        Fetch job listings from the ArbeitNow API.
 
-        TODO: add this param (only options so use this as a particular feature): visa_sponsorship=true/false
+        Args:
+            visa_sponsorship (bool): Filter jobs by visa sponsorship availability.
+
+        Returns:
+            A dictionary containing job listings and metadata, or an error message.
         """
 
         data = {}
@@ -56,6 +62,13 @@ class ArbeitNow:
         pages = PAGES_MAX
         params["page"] = pages
         response = requests.get(API_URL, params=params)
+        if response.status_code != 200:
+            # TODO: clean logging
+            error_msg = (
+                f"Status code: {response.status_code}, Reason: {response.reason}"
+            )
+            LOGGER.error(error_msg)
+            return error_msg + "There was an error please display something to the user"
         json_data: dict = response.json()
         number_offers = json_data["meta"]["to"]
 
@@ -64,6 +77,16 @@ class ArbeitNow:
             pages //= 2
             params["page"] = pages
             response = requests.get(API_URL, params=params)
+            if response.status_code != 200:
+                # TODO: clean logging
+                error_msg = (
+                    f"Status code: {response.status_code}, Reason: {response.reason}"
+                )
+                LOGGER.error(error_msg)
+                return (
+                    error_msg
+                    + "There was an error please display something to the user"
+                )
             json_data: dict = response.json()
             number_offers = json_data["meta"]["to"]
 
@@ -72,6 +95,16 @@ class ArbeitNow:
             pages += 1
             params["page"] = pages
             response = requests.get(API_URL, params=params)
+            if response.status_code != 200:
+                # TODO: clean logging
+                error_msg = (
+                    f"Status code: {response.status_code}, Reason: {response.reason}"
+                )
+                LOGGER.error(error_msg)
+                return (
+                    error_msg
+                    + "There was an error please display something to the user"
+                )
             json_data: dict = response.json()
             number_offers = json_data["meta"]["to"]
 
