@@ -8,6 +8,7 @@ QUICK-START DEVELOPMENT SETTINGS - UNSUITABLE FOR PRODUCTION
 import sys
 import os
 
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 from pathlib import Path
@@ -173,13 +174,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # under developement (do not delete)
 # visual tool: https://crontab.guru/
 
-
-# if someone smart can debug this import issue 🤪🤔
-def dummy_task():
-    print("Hello from dummy task!")
-
-
-CRONJOBS = [("*/1 * * * *", "settings.dummy_task")]
+# the path is correct when exec from terminal but does not work console 🫥
+CRONJOBS = [("*/1 * * * *", "core.cron.dummy_task")]
 
 # ("0 3 * * SUN", "backend.core.cron.adzuna_run"),  # At 03:00 on Sunday
 # ("*/1 * * * *", "backend.core.cron.test_run"),

@@ -24,6 +24,9 @@ from backend.job_assistant.jobs_providers.the_muse import TheMuse
 GOOGLE_DRIVE_MANAGER = GoogleDriveManager()
 
 
+def dummy_task():
+    print("Hello from dummy task!")
+
 def adzuna_run():
     """
     Collects and stores salary statistics from Adzuna for IT jobs at various experience levels

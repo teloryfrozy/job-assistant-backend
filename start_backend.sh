@@ -1,10 +1,12 @@
 #!/bin/bash
 
+# THIS FILE WILL BE REPLACE BY A ROBUST DOCKER CONFIG
+
 # Get the absolute path
 ABS_PATH=$(pwd)
 
 # Activate Python environment and execute backend commands
-source "$ABS_PATH/py_env/bin/activate"
+source "$ABS_PATH/my_new_env/bin/activate"
 
 # Run backend setup commands
 cd backend

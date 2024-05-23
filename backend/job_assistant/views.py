@@ -9,9 +9,16 @@ import logging
 from django.http import HttpRequest, JsonResponse
 from rest_framework.decorators import api_view
 
-from backend.job_assistant.constants import ADZUNA, FINDWORK, REED_CO_UK, THE_MUSE
+from backend.job_assistant.constants import (
+    ADZUNA,
+    ARBEIT_NOW,
+    FINDWORK,
+    REED_CO_UK,
+    THE_MUSE,
+)
 from backend.job_assistant.gdrive import GoogleDriveManager
 from backend.job_assistant.jobs_providers.adzuna import Adzuna
+from backend.job_assistant.jobs_providers.arbeitnow import ArbeitNow
 from backend.job_assistant.jobs_providers.findwork import FindWork
 from backend.job_assistant.jobs_providers.job_statistics import JobStatisticsManager
 from backend.job_assistant.jobs_providers.reed_co_uk import ReedCoUk
@@ -27,7 +34,30 @@ def test(request):
 
 
 @api_view(["POST"])
+def get_jobs_arbeit_now(request: HttpRequest):
+    """
+    TODO
+    """
+    parameters: dict = json.loads(request.body)
+    visa_sponsorship = parameters.get("visa_sponsorship")
+
+    GOOGLE_DRIVE_MANAGER = GoogleDriveManager()
+    job_statistics_manager = JobStatisticsManager(GOOGLE_DRIVE_MANAGER, ARBEIT_NOW)
+
+    jobs_offers = {}
+    arbeit_now = ArbeitNow(job_statistics_manager)
+
+    arbeit_now_job_offers = arbeit_now.get_jobs(visa_sponsorship)
+    jobs_offers[ARBEIT_NOW] = arbeit_now_job_offers
+
+
+    return JsonResponse({"offers": arbeit_now_job_offers}, status=status.HTTP_200_OK)
+
+@api_view(["POST"])
 def get_jobs(request: HttpRequest):
+    """
+    TODO
+    """
     parameters: dict = json.loads(request.body)
 
     # TODO: review all jobs providers docs and add ALL possible params

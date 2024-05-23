@@ -54,6 +54,9 @@ FINDWORK = "Findwork"
 # ----------------------- The Muse ----------------------- #
 THE_MUSE = "TheMuse"
 
+# ----------------------- Arbeit Now ----------------------- #
+ARBEIT_NOW = "ArbeitNow"
+
 
 ######################## ARTIFICIAL INTELLIGENCE ########################
 
