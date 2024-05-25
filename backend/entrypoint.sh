@@ -1,44 +1,40 @@
 #!/bin/sh
 
+# ────────────────────────────────────────────────────────────────────────────────
+# Shell Script for Django Application Setup and Cron Management
+# ────────────────────────────────────────────────────────────────────────────────
+
 # Define color codes
-RED='\033[0;31m'
-GREEN='\033[0;32m'
+RED='\033[1;31m'
+GREEN='\033[1;32m'
 YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
+BLUE='\033[1;34m'
 NC='\033[0m' # No Color
 
-# Function to print messages in color
 print_message() {
-    COLOR=$1
-    MESSAGE=$2
-    echo "${COLOR}${MESSAGE}${NC}"
+    echo "${1}${2}${NC}"
 }
 
-python3 manage.py migrate
-if [ $? -eq 0 ]; then
-    print_message $GREEN "Migrations applied successfully."
-else
-    print_message $RED "Migrations failed."
-    exit 1
-fi
+# Apply database migrations
+print_message $BLUE "Applying database migrations..."
+python3 manage.py migrate && \
+    print_message $GREEN "Migrations applied successfully." || \
+    { print_message $RED "Migrations failed."; exit 1; }
 
-# Start cron service
-print_message $BLUE "Starting Cron service"
+# Start Cron service
+print_message $BLUE "Starting Cron service..."
 service cron start
 
 # Set cron tasks
 print_message $BLUE "Setting cron tasks..."
-python3 manage.py crontab add
-if [ $? -eq 0 ]; then
-    print_message $GREEN "Cron tasks set successfully."
-else
-    print_message $RED "Setting cron tasks failed."
-    exit 1
-fi
+python3 manage.py crontab add && \
+    print_message $GREEN "Cron tasks set successfully." || \
+    { print_message $RED "Setting cron tasks failed."; exit 1; }
 
-print_message $BLUE "Active cron jobs"
+# Show active cron jobs
+print_message $YELLOW "Active cron jobs:"
 python3 manage.py crontab show
 
-# Start the Django application
-print_message $BLUE "Starting Django application"
+# Start Django application
+print_message $BLUE "Starting Django application..."
 exec "$@"
