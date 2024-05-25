@@ -11,20 +11,10 @@ NC='\033[0m' # No Color
 print_message() {
     COLOR=$1
     MESSAGE=$2
-    echo "${COLOR}========= ${MESSAGE} =========${NC}"
+    echo "${COLOR}${MESSAGE}${NC}"
 }
 
-# Apply database migrations
-print_message $BLUE "Applying database migrations..."
-python manage.py makemigrations
-if [ $? -eq 0 ]; then
-    print_message $GREEN "Makemigrations completed successfully."
-else
-    print_message $RED "Makemigrations failed."
-    exit 1
-fi
-
-python manage.py migrate
+python3 manage.py migrate
 if [ $? -eq 0 ]; then
     print_message $GREEN "Migrations applied successfully."
 else
@@ -38,7 +28,7 @@ service cron start
 
 # Set cron tasks
 print_message $BLUE "Setting cron tasks..."
-python manage.py crontab add
+python3 manage.py crontab add
 if [ $? -eq 0 ]; then
     print_message $GREEN "Cron tasks set successfully."
 else
@@ -47,7 +37,7 @@ else
 fi
 
 print_message $BLUE "Active cron jobs"
-python manage.py crontab show
+python3 manage.py crontab show
 
 # Start the Django application
 print_message $BLUE "Starting Django application"

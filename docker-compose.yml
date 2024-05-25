@@ -2,10 +2,10 @@ version: '3.8'
 
 services:
   backend:
-    build: .
-    container_name: job-assistant-backend
-    volumes:
-      - ./app:/usr/src/app
     env_file: .env
+    build:
+      dockerfile: ./backend/Dockerfile
     ports:
-      - 8000:8000
+      - "9000:9000"
+    volumes:
+      - ./backend:/backend
