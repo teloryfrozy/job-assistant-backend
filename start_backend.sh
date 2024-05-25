@@ -12,5 +12,5 @@ source "$ABS_PATH/my_new_env/bin/activate"
 cd backend
 python3 manage.py makemigrations
 python3 manage.py migrate
-python manage.py crontab add
+python3 manage.py crontab add
 python3 manage.py runserver 9000
