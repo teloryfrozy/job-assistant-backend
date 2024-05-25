@@ -27,6 +27,17 @@ GOOGLE_DRIVE_MANAGER = GoogleDriveManager()
 def dummy_task():
     print("Hello from dummy task!")
 
+
+def collect_job_data():
+    """
+    Runs all scheduled tasks to collect and store job market data.
+    """
+    adzuna_run()
+    reed_co_uk_run()
+    find_work_run()
+    the_muse_run()
+
+
 def adzuna_run():
     """
     Collects and stores salary statistics from Adzuna for IT jobs at various experience levels
@@ -37,7 +48,6 @@ def adzuna_run():
         for experience in EXPERIENCE_LEVELS:
             job_title = f"{experience} {job}"
             adzuna.set_salaries_stats(job_title)
-            # TODO: define when the cron should be run
             adzuna.set_number_offers(
                 country="fr",
                 params={

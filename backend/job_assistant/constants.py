@@ -7,20 +7,26 @@ Otherwise they should be defined locally
 """
 
 import os
-from pathlib import Path
-from dotenv import load_dotenv
 
 # TODO: organize banner and constants
 # TODO: create a FOLDER: "constants" and a file for job constants
 
 
 ######################## SECURITY ########################
-root = Path(__file__).resolve().parent.parent.parent
-env_path = root / ".env"
-load_dotenv(dotenv_path=env_path)
 DJANGO_SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 # --- Google Drive --- #
-JSON_KEY_FILE = root / "gdrive_creds.json"
+GDRIVE_SERVICE_CREDS = {
+    "type": os.getenv("GDRIVE_TYPE"),
+    "project_id": os.getenv("GDRIVE_PROJECT_ID"),
+    "private_key_id": os.getenv("GDRIVE_PRIVATE_KEY_ID"),
+    "private_key": os.getenv("GDRIVE_PRIVATE_KEY").replace("\\n", "\n"),
+    "client_email": os.getenv("GDRIVE_CLIENT_EMAIL"),
+    "client_id": os.getenv("GDRIVE_CLIENT_ID"),
+    "auth_uri": os.getenv("GDRIVE_AUTH_URI"),
+    "token_uri": os.getenv("GDRIVE_TOKEN_URI"),
+    "auth_provider_x509_cert_url": os.getenv("GDRIVE_AUTH_PROVIDER_X509_CERT_URL"),
+    "client_x509_cert_url": os.getenv("GDRIVE_CLIENT_X509_CERT_URL"),
+}
 SCOPES = ["https://www.googleapis.com/auth/drive"]
 STATS_SALARIES_FILE_ID = os.getenv("STATS_SALARIES_FILE_ID")
 STATS_NUMBER_OFFERS_FILE_ID = os.getenv("STATS_NUMBER_OFFERS_FILE_ID")

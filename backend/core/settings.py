@@ -32,7 +32,7 @@ USE_TZ = True
 
 ######################## SECURITY ########################
 DEBUG = True
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 CORS_ALLOW_ALL_ORIGINS = False
 DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
@@ -173,10 +173,10 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 ######################## SCHEDULED TASKS ########################
 # under developement (do not delete)
-# visual tool: https://crontab.guru/
+# documentation: https://crontab.guru/
 
 # the path is correct when exec from terminal but does not work console 🫥
-CRONJOBS = [("*/1 * * * *", "core.cron.dummy_task")]
-
-# ("0 3 * * SUN", "backend.core.cron.adzuna_run"),  # At 03:00 on Sunday
-# ("*/1 * * * *", "backend.core.cron.test_run"),
+CRONJOBS = [
+    ("*/1 * * * *", "core.cron.dummy_task"),
+    ("0 3 * * SUN", "core.cron.collect_job_data"),  # At 03:00 on Sunday
+]

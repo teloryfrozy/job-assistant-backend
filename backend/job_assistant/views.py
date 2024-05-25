@@ -36,7 +36,7 @@ def test(request):
 @api_view(["POST"])
 def get_jobs_arbeit_now(request: HttpRequest):
     """
-    TODO
+    TODO    
     """
     parameters: dict = json.loads(request.body)
     visa_sponsorship = parameters.get("visa_sponsorship")
@@ -56,7 +56,7 @@ def get_jobs_arbeit_now(request: HttpRequest):
 @api_view(["POST"])
 def get_jobs(request: HttpRequest):
     """
-    TODO
+    TODO: clean doc as a senior Python developer with 20 years of experience of that function get_jobs
     """
     parameters: dict = json.loads(request.body)
 

@@ -6,7 +6,7 @@ from io import BytesIO
 import json
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
-from .constants import JSON_KEY_FILE, SCOPES
+from .constants import GDRIVE_SERVICE_CREDS, SCOPES
 from googleapiclient.http import MediaIoBaseUpload
 
 
@@ -26,8 +26,8 @@ class GoogleDriveManager:
 
     def __init__(self):
         """Authenticate with Google Drive API using service account credentials."""
-        credentials = service_account.Credentials.from_service_account_file(
-            JSON_KEY_FILE, scopes=SCOPES
+        credentials = service_account.Credentials.from_service_account_info(
+            GDRIVE_SERVICE_CREDS, scopes=SCOPES
         )
         self.drive_service = build("drive", "v3", credentials=credentials)
 
@@ -167,7 +167,7 @@ class GoogleDriveManager:
                 mimetype="application/json",
             )
             file_metadata = {"name": file_name, "parents": [parent_id]}
-            file:dict = (
+            file: dict = (
                 self.drive_service.files()
                 .create(body=file_metadata, media_body=media_body, fields="id")
                 .execute()
