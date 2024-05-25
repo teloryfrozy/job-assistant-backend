@@ -28,7 +28,7 @@ from backend.job_assistant.jobs_providers.the_muse import TheMuse
 LOGGER = logging.getLogger(__name__)
 
 
-@api_view(["POST"])
+@api_view(["GET"])
 def test(request):
     return JsonResponse({"message": "Test successful"})
 
