@@ -20,9 +20,6 @@ ABS_MAX_SALARY = 0
 SALARY_PER_YEAR = 10_000
 
 
-# TODO: add def set_number_offers(self, job_title: str) -> None: method
-
-
 class ReedCoUk:
     """
     Class for interacting with the Reed CO UK API and performing statistical analysis on job salaries.
@@ -234,3 +231,32 @@ class ReedCoUk:
                     data["results"].append(job_info)
 
         return data
+
+    def set_number_offers(
+        self,
+        job_title: str,
+    ):
+        """
+        Fetches the number of job offers based on the provided search parameters.
+
+        Args:
+            - job_title (str): Job title to search for.
+        """
+        params = {
+            "fullTime": "true",
+            "keywords": job_title,
+        }
+        response = requests.get(
+            API_URL, params=params, auth=(REED_CO_UK_SECRET_KEY, "")
+        )
+
+        if response.status_code == 200:
+            json_data = response.json()
+            number_offers = json_data["totalResults"]
+            self.job_statistics_manager.store_number_offers(job_title, number_offers)
+        else:
+            error_msg = f"Failed to fetch jobs data from URL: {API_URL}. "
+            error_msg += (
+                f"Status code: {response.status_code}, Reason: {response.reason}"
+            )
+            LOGGER.error(error_msg)

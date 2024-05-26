@@ -61,7 +61,7 @@ class FindWork:
         Returns:
             list: List of job data.
         """
-        # TODO: add a streaming with a websocket to see a progress bar in FE
+        
         data = {}
         params["page"] = 1
 

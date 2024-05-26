@@ -70,6 +70,7 @@ def reed_co_uk_run():
         for experience in EXPERIENCE_LEVELS:
             job_title = f"{experience} {job}"
             reed_co_uk.set_salaries_stats(job_title)
+            reed_co_uk.set_number_offers(job_title)
 
 
 def find_work_run():

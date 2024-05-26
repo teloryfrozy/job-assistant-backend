@@ -43,8 +43,6 @@ class Adzuna:
     """
     Class for interacting with the Adzuna API and performing statistical analysis on job salaries.
 
-    # TODO: add def set_number_offers(self, job_title: str) -> None: method
-
     # TODO: set_salaries_stats per country in an other function (and place of storage in gdrive)
     """
 
@@ -153,7 +151,6 @@ class Adzuna:
         """
         TODO: clean doc as a senior backend python developer
         """
-        # TODO: add a streaming with a websocket to see a progress bar in FE
         params = self.get_params(params)
         params["results_per_page"] = RESULTS_PER_PAGE
 

@@ -79,7 +79,7 @@ class TheMuse:
         """
         TODO: clean doc as a senior backend python developer
         """
-        # TODO: add a streaming with a websocket to see a progress bar in FE
+        
         data = {}
         params["page"] = 1
         response = requests.get(f"{API_URL}jobs", params=params)
