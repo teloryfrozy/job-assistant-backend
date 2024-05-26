@@ -61,40 +61,75 @@ class ReedCoUk:
             LOGGER.error(
                 f"Failed to retrieve data: {response.status_code} - {response.reason}"
             )
-            return
+            raise Exception(
+                f"Failed to retrieve data: {response.status_code} - {response.reason}"
+            )
 
-        data = response.json()
-        total_results = data["totalResults"]
-        pages = (total_results // RESULTS_PER_PAGE) + 1
+        json_data = response.json()
+        number_offers = json_data["totalResults"]
+
+        nb_pages = number_offers // RESULTS_PER_PAGE
+        if number_offers % RESULTS_PER_PAGE > 0:
+            nb_pages += 1
 
         salaries_data = {}
 
-        for page in range(1, pages + 1):
+        results: list[dict] = json_data["results"]
+        for job in results:
+            currency = job.get("currency")
+            if currency and currency not in salaries_data:
+                salaries_data[currency] = {
+                    "all_salaries": [],
+                    "abs_min_salary": ABS_MIN_SALARY,
+                    "abs_max_salary": ABS_MAX_SALARY,
+                }
+
+            max_salary = job.get("maximumSalary")
+            min_salary = job.get("minimumSalary")
+            if max_salary and min_salary:
+                # Sometimes salary is the pay per day
+                if max_salary > SALARY_PER_YEAR and min_salary > SALARY_PER_YEAR:
+                    all_salaries = salaries_data[currency]["all_salaries"]
+                    all_salaries.append(max_salary)
+                    all_salaries.append(min_salary)
+
+                    if max_salary > salaries_data[currency]["abs_max_salary"]:
+                        salaries_data[currency]["abs_max_salary"] = max_salary
+                    if min_salary < salaries_data[currency]["abs_min_salary"]:
+                        salaries_data[currency]["abs_min_salary"] = min_salary
+
+                    salaries_data[currency]["all_salaries"] = all_salaries
+
+        for page in range(2, nb_pages + 1):
             params["page"] = page
+
             response = requests.get(
                 API_URL, params=params, auth=(REED_CO_UK_SECRET_KEY, "")
             )
 
             if response.status_code != 200:
                 LOGGER.error(
-                    f"Failed to retrieve data on page {page}: {response.status_code} - {response.reason}"
+                    f"Failed to retrieve data: {response.status_code} - {response.reason}"
                 )
-                continue
+                raise Exception(
+                    f"Failed to retrieve data: {response.status_code} - {response.reason}"
+                )
 
-            data = response.json()
-            for job in data["results"]:
-                currency = job["currency"]
-                if currency not in salaries_data and currency is not None:
+            json_data: dict = response.json()
+            results: list[dict] = json_data["results"]
+            for job in results:
+                currency = job.get("currency")
+                if currency and currency not in salaries_data:
                     salaries_data[currency] = {
                         "all_salaries": [],
                         "abs_min_salary": ABS_MIN_SALARY,
                         "abs_max_salary": ABS_MAX_SALARY,
                     }
 
-                max_salary = job["maximumSalary"]
-                min_salary = job["minimumSalary"]
-                if max_salary is not None and min_salary is not None:
-                    # sometimes salary is the pay per day
+                max_salary = job.get("maximumSalary")
+                min_salary = job.get("minimumSalary")
+                if max_salary and min_salary:
+                    # Sometimes salary is the pay per day
                     if max_salary > SALARY_PER_YEAR and min_salary > SALARY_PER_YEAR:
                         all_salaries: list = salaries_data[currency]["all_salaries"]
                         all_salaries.append(max_salary)
@@ -112,7 +147,9 @@ class ReedCoUk:
                 job_title, salaries_data
             )
         else:
-            LOGGER.error("No salary data available for the given job title.")
+            LOGGER.info(
+                f"No salary data available for the given job title: {job_title}"
+            )
 
     def get_jobs(self, params: dict) -> dict[str, list] | str:
         """
@@ -134,12 +171,11 @@ class ReedCoUk:
             API_URL, params=params, auth=(REED_CO_UK_SECRET_KEY, "")
         )
         if response.status_code != 200:
-            # TODO: clean logging
             error_msg = (
                 f"Status code: {response.status_code}, Reason: {response.reason}"
             )
             LOGGER.error(error_msg)
-            return error_msg + "There was an error please display something to the user"
+            return error_msg
 
         json_data: dict = response.json()
         number_offers = json_data["totalResults"]
@@ -175,13 +211,9 @@ class ReedCoUk:
                 )
 
                 if response.status_code != 200:
-                    # TODO: clean logging
                     error_msg = f"PAGE: {i}, Status code: {response.status_code}, Reason: {response.reason}"
                     LOGGER.error(error_msg)
-                    return (
-                        error_msg
-                        + "There was an error please display something to the user"
-                    )
+                    return error_msg
 
                 json_data: dict = response.json()
                 results: dict = json_data["results"]
