@@ -55,7 +55,7 @@ class ReedCoUk:
 
             for job in data["results"]:
                 currency = job["currency"]
-                if currency not in salaries_data:
+                if currency not in salaries_data and currency is not None:
                     salaries_data[currency] = {
                         "all_salaries": [],
                         "abs_min_salary": ABS_MIN_SALARY,
@@ -156,7 +156,6 @@ class ReedCoUk:
                 results: dict = json_data["results"]
 
                 for result in results:
-                    print(result)
                     job_info = {
                         "title": result["jobTitle"],
                         "min_salary": result["minimumSalary"],

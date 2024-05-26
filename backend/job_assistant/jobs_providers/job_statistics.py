@@ -94,25 +94,26 @@ class JobStatisticsManager:
             min_salary = currency_data.get("abs_min_salary")
             max_salary = currency_data.get("abs_max_salary")
 
-            stats_data = {
-                "std_dev": int(np.std(all_salaries)),
-                "kurtosis": float(stats.kurtosis(all_salaries)),
-                "skewness": float(stats.skew(all_salaries)),
-                "avg": int(np.mean(all_salaries)),
-            }
+            if all_salaries:
+                stats_data = {
+                    "std_dev": int(np.std(all_salaries)),
+                    "kurtosis": float(stats.kurtosis(all_salaries)),
+                    "skewness": float(stats.skew(all_salaries)),
+                    "avg": int(np.mean(all_salaries)),
+                }
 
-            if min_salary is not None:
-                stats_data["min"] = min_salary
-            if max_salary is not None:
-                stats_data["max"] = max_salary
+                if min_salary is not None:
+                    stats_data["min"] = min_salary
+                if max_salary is not None:
+                    stats_data["max"] = max_salary
 
-            json_data[date][self.api_name][job_title][currency] = stats_data
-        print(json_data)
+                json_data[date][self.api_name][job_title][currency] = stats_data
+
         self.gdrive_manager.overwrite_json_file(json_data, STATS_SALARIES_FILE_ID)
         LOGGER.info(
             f"{Fore.GREEN}Salaries statistics stored for {job_title} for API: {self.api_name} on {date}"
         )
-        
+
     def store_number_offers(self, job_title: str, number_offers: int) -> None:
         """
         Stores the number of job offers for a given job title on the current date, associated with a specific API.

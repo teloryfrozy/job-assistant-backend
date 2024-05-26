@@ -72,8 +72,6 @@ class Adzuna:
 
     def set_salaries_stats(self, job: str):
         """
-        TODO: Add currency on gdrive: GBP
-
         Retrieves job statistics including average salary, standard deviation, kurtosis, and skewness
         based on job title and skills.
 
