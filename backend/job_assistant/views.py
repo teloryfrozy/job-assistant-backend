@@ -8,7 +8,6 @@ from rest_framework import status
 import logging
 from django.http import HttpRequest, JsonResponse
 from rest_framework.decorators import api_view
-
 from job_assistant import pdf_manager
 from job_assistant.constants import (
     ADZUNA,
