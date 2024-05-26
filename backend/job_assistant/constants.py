@@ -17,7 +17,7 @@ GDRIVE_SERVICE_CREDS = {
     "type": os.getenv("GDRIVE_TYPE"),
     "project_id": os.getenv("GDRIVE_PROJECT_ID"),
     "private_key_id": os.getenv("GDRIVE_PRIVATE_KEY_ID"),
-    "private_key": os.getenv("GDRIVE_PRIVATE_KEY").replace("\\n", "\n"),
+    "private_key": os.getenv("GDRIVE_PRIVATE_KEY"),
     "client_email": os.getenv("GDRIVE_CLIENT_EMAIL"),
     "client_id": os.getenv("GDRIVE_CLIENT_ID"),
     "auth_uri": os.getenv("GDRIVE_AUTH_URI"),

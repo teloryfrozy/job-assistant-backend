@@ -35,4 +35,4 @@ from core.cron import adzuna_run, reed_co_uk_run, find_work_run, the_muse_run
 # find_work_run()
 # the_muse_run()
 # reed_co_uk_run()
-# adzuna_run()
+adzuna_run()
