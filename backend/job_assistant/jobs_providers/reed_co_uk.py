@@ -20,25 +20,33 @@ ABS_MAX_SALARY = 0
 SALARY_PER_YEAR = 10_000
 
 
+# TODO: add def set_number_offers(self, job_title: str) -> None: method
+
+
 class ReedCoUk:
     """
     Class for interacting with the Reed CO UK API and performing statistical analysis on job salaries.
-
-    # TODO: add def set_number_offers(self, job_title: str) -> None: method
     """
 
     def __init__(self, job_statistics_manager: JobStatisticsManager) -> None:
+        """
+        Initialize the ReedCoUk instance.
+
+        Args:
+            job_statistics_manager (JobStatisticsManager): An instance of JobStatisticsManager
+                responsible for managing and storing job statistics.
+        """
         self.job_statistics_manager = job_statistics_manager
 
     def set_salaries_stats(self, job_title: str):
         """
-        Retrieves job statistics including average salary, standard deviation, kurtosis, and skewness, min and max
+        Retrieves job statistics including average salary, standard deviation, kurtosis, skewness, min, and max
         based on job title.
 
         Args:
             job_title (str): Job title.
 
-        TODO: add pages to get more than 100 results
+        The list of salaries is retrieved across multiple pages if necessary.
         """
         params = {
             "fullTime": "true",
@@ -49,10 +57,31 @@ class ReedCoUk:
             API_URL, params=params, auth=(REED_CO_UK_SECRET_KEY, "")
         )
 
-        if response.status_code == 200:
-            salaries_data = {}
-            data = response.json()
+        if response.status_code != 200:
+            LOGGER.error(
+                f"Failed to retrieve data: {response.status_code} - {response.reason}"
+            )
+            return
 
+        data = response.json()
+        total_results = data["totalResults"]
+        pages = (total_results // RESULTS_PER_PAGE) + 1
+
+        salaries_data = {}
+
+        for page in range(1, pages + 1):
+            params["page"] = page
+            response = requests.get(
+                API_URL, params=params, auth=(REED_CO_UK_SECRET_KEY, "")
+            )
+
+            if response.status_code != 200:
+                LOGGER.error(
+                    f"Failed to retrieve data on page {page}: {response.status_code} - {response.reason}"
+                )
+                continue
+
+            data = response.json()
             for job in data["results"]:
                 currency = job["currency"]
                 if currency not in salaries_data and currency is not None:
@@ -76,27 +105,29 @@ class ReedCoUk:
                         if min_salary < salaries_data[currency]["abs_min_salary"]:
                             salaries_data[currency]["abs_min_salary"] = min_salary
 
-                        if max_salary and min_salary:
-                            all_salaries.extend([max_salary, min_salary])
-
                         salaries_data[currency]["all_salaries"] = all_salaries
 
-            if salaries_data:
-                self.job_statistics_manager.store_salaries_statistics(
-                    job_title, salaries_data
-                )
-            else:
-                LOGGER.error("No salary data available for the given job title.")
-        else:
-            LOGGER.error(
-                f"Failed to retrieve data: {response.status_code} - {response.reason}"
+        if salaries_data:
+            self.job_statistics_manager.store_salaries_statistics(
+                job_title, salaries_data
             )
+        else:
+            LOGGER.error("No salary data available for the given job title.")
 
     def get_jobs(self, params: dict) -> dict[str, list] | str:
         """
-        TODO: clean doc as a senior backend python developer
+        Fetches job listings based on provided search parameters.
+
+        This method interacts with the Reed API to fetch job listings according to the given parameters.
+        It handles pagination and aggregates results from multiple pages if necessary.
+
+        Args:
+            params (dict): Dictionary of query parameters to be sent to the API.
+
+        Returns:
+            dict[str, list]: A dictionary containing the number of offers and a list of job details.
+            str: An error message if the API request fails.
         """
-        # TODO: add a streaming with a websocket to see a progress bar in FE
         data = {}
 
         response = requests.get(
