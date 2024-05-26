@@ -201,7 +201,7 @@ def get_jobs(request: HttpRequest):
         if max_days_old:
             params["max_days_old"] = max_days_old
         if skills:
-            params["skills"] = skills
+            params["description"] = ",".join(skills)
         if contract:
             params["contract"] = 1
         if full_time:

@@ -16,12 +16,9 @@ from job_assistant.jobs_providers.job_statistics import JobStatisticsManager
 
 
 ######################## LOGGING CONFIGURATION ########################
-logging.basicConfig(level=logging.INFO)
 LOGGER = logging.getLogger(__name__)
-
 API_URL = "https://www.themuse.com/api/public/"
 RESULTS_PER_PAGE = 20
-
 THE_MUSE_LEVELS = {
     "Intern": "internship",
     "Junior": "entry",
