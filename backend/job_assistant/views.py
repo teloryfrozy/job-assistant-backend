@@ -163,15 +163,17 @@ def get_jobs(request: HttpRequest):
 
     job_title: str = parameters["job_title"]
     jobs_providers: list = parameters["jobs_providers"]
-    level: str = parameters.get("level")
+    levels: list = parameters.get("level")
     skills: list = parameters.get("skills")
+    max_days_old: int = parameters.get("max_days_old")
+    categories: list = parameters.get("categories")
     location: dict = parameters.get("location")
     if location:
         city: str = location.get("city")
         country: str = location.get("country")
+    location_list: list = parameters.get("location_list")
     min_salary: int = parameters.get("min_salary")
     max_salary: int = parameters.get("max_salary")
-    max_days_old: int = parameters.get("max_days_old")
     full_time: bool = parameters.get("full_time")
     permanent: bool = parameters.get("permanent")
     contract: bool = parameters.get("contract")
@@ -196,7 +198,10 @@ def get_jobs(request: HttpRequest):
             "salary_min": min_salary,
             "salary_max": max_salary,
         }
-
+        if max_days_old:
+            params["max_days_old"] = max_days_old
+        if skills:
+            params["skills"] = skills
         if contract:
             params["contract"] = 1
         if full_time:
@@ -271,18 +276,9 @@ def get_jobs(request: HttpRequest):
 
         params = {
             "query": job_title,
-            "level": level,
-            "category": [
-                # "Computer and IT",
-                # "Data and Analytics",
-                # "Data Science",
-                "Design and UX",
-                # "IT",
-                # "Software Engineer",
-                # "Software Engineering",
-            ],
-            # "level": ["Senior Level", "Internship"],
-            "location": ["London, United Kingdom", "Paris, France"],
+            "level": levels,
+            "category": categories,
+            "location": location_list,
         }
 
         the_muse_job_offers = the_muse.get_jobs(params)
