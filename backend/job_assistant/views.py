@@ -251,7 +251,8 @@ def get_jobs(request: HttpRequest):
         }
 
         reed_co_uk_job_offers = reed_co_uk.get_jobs(params)
-        jobs_offers[REED_CO_UK] = reed_co_uk_job_offers
+        if isinstance(reed_co_uk_job_offers, dict):
+            jobs_offers[REED_CO_UK] = reed_co_uk_job_offers
     ####################################################
     if THE_MUSE in jobs_providers:
         job_statistics_manager.api_name = THE_MUSE
@@ -274,6 +275,7 @@ def get_jobs(request: HttpRequest):
         }
 
         the_muse_job_offers = the_muse.get_jobs(params)
-        jobs_offers[THE_MUSE] = the_muse_job_offers
+        if isinstance(the_muse_job_offers, dict):
+            jobs_offers[THE_MUSE] = the_muse_job_offers
     ####################################################
     return JsonResponse({"offers": jobs_offers}, status=status.HTTP_200_OK)
