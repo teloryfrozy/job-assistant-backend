@@ -37,6 +37,18 @@ def test(request):
 
 @api_view(["POST"])
 def analyze_cv(request: HttpRequest):
+    """
+    Analyzes a CV from a PDF file, extracting keywords and summarizing the content using AI.
+
+    Expects:
+        Content-Type: application/pdf
+        Body: PDF file content
+
+    Responses:
+        200 OK: Successfully processed the CV.
+        400 Bad Request: Unsupported file type or file too large.
+        500 Internal Server Error: Error during CV analysis.
+    """
     try:
         content_type = request.headers.get("Content-Type")
         if content_type != "application/pdf":
