@@ -17,6 +17,7 @@ IDEA:
 add tools to the ai such as checking the number of github contributions to verify if skills are valid
 """
 
+import logging
 import re
 import requests
 import json
@@ -25,6 +26,8 @@ from job_assistant.constants import (
     AWANLLM_SECRET_KEY,
 )
 
+######################## LOGGING CONFIGURATION ########################
+LOGGER = logging.getLogger(__name__)
 AWANLLM_API = "https://api.awanllm.com/v1/chat/completions"
 MODEL = "Meta-Llama-3-8B-Instruct"
 ROLE = "assistant"
@@ -101,17 +104,29 @@ def summarize_resume(keywords: str) -> dict:
         }}
     }}
     """
-    clear_text = get_response(template)
-    print(f"============ DEBUGGING RESUME SUMMARY ============")
-    print(clear_text)
+    try:
+        clear_text = get_response(template)
+        LOGGER.debug("Response from API: %s", clear_text)
 
-    pattern = r"```(.*?)```"
-    matches = re.findall(pattern, clear_text, re.DOTALL)
+        pattern = r"```(.*?)```"
+        matches = re.findall(pattern, clear_text, re.DOTALL)
 
-    if matches:
-        user_data = json.loads(matches[0])
-    else:
-        json_text = clear_text.split("JSON format:", 1)[-1].strip()
-        user_data = json.loads(json_text)
+        if matches:
+            user_data = json.loads(matches[0])
+        else:
+            json_text = clear_text.split("JSON format:", 1)[-1].strip()
+            user_data = json.loads(json_text)
 
-    return user_data
+        return user_data
+
+    except json.JSONDecodeError as e:
+        LOGGER.critical(
+            f"The AI failed to return a proper JSON format. Error: {str(e)}"
+        )
+        raise json.JSONDecodeError(
+            "The AI failed to return a proper JSON format", doc=clear_text, pos=0
+        )
+
+    except Exception as e:
+        LOGGER.error(f"An error occurred while summarizing the resume. Error: {str(e)}")
+        raise

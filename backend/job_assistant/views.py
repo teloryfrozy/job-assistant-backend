@@ -34,16 +34,16 @@ LOGGER = logging.getLogger(__name__)
 def test(request):
     return JsonResponse({"message": "Test successful"})
 
+
 @api_view(["POST"])
 def analyze_cv(request: HttpRequest):
     try:
         # Check Content-Type header
-        content_type = request.headers.get('Content-Type')
-        if content_type != 'application/pdf':
+        content_type = request.headers.get("Content-Type")
+        if content_type != "application/pdf":
             LOGGER.error("Unsupported file type: %s", content_type)
             return JsonResponse(
-                {"error": "Unsupported file type"},
-                status=status.HTTP_400_BAD_REQUEST
+                {"error": "Unsupported file type"}, status=status.HTTP_400_BAD_REQUEST
             )
 
         # Read the binary data from the request body
@@ -52,10 +52,9 @@ def analyze_cv(request: HttpRequest):
         # Check file size (10MB = 10 * 1024 * 1024 bytes)
         max_size = 10 * 1024 * 1024
         if len(file_content) > max_size:
-            LOGGER.error("File too large: %s bytes", len(file_content))
+            LOGGER.error("File too large: %d bytes", len(file_content))
             return JsonResponse(
-                {"error": "File too large"},
-                status=status.HTTP_400_BAD_REQUEST
+                {"error": "File too large"}, status=status.HTTP_400_BAD_REQUEST
             )
 
         # Extract keywords from the file content
@@ -75,11 +74,10 @@ def analyze_cv(request: HttpRequest):
             status=status.HTTP_200_OK,
         )
     except Exception as e:
-        # TODO use f"" print everywhere"
-        LOGGER.error("An error occurred: %s", str(e))
+        LOGGER.exception("An error occurred during CV analysis: %s", e)
         return JsonResponse(
             {"error": "An internal error occurred"},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
 
