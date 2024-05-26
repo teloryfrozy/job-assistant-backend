@@ -63,7 +63,8 @@ class FindWork:
         """
         # TODO: add a streaming with a websocket to see a progress bar in FE
         data = {}
-        params = {"employment_type": "full time", "page": 1}
+        params["page"] = 1
+        
 
         response = requests.get(API_URL, headers=self.headers, params=params)
         if response.status_code != 200:

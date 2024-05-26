@@ -160,10 +160,10 @@ def get_jobs(request: HttpRequest):
     parameters: dict = json.loads(request.body)
 
     # TODO: review all jobs providers docs and add ALL possible params
+
     job_title: str = parameters["job_title"]
     jobs_providers: list = parameters["jobs_providers"]
     level: str = parameters.get("level")
-    # sort_by:str = data["sortBy"]
     skills: list = parameters.get("skills")
     location: dict = parameters.get("location")
     if location:
@@ -217,16 +217,27 @@ def get_jobs(request: HttpRequest):
         job_statistics_manager.api_name = FINDWORK
         find_work = FindWork(job_statistics_manager)
 
-        # TODO: add clean params instead of hard coding
-        params = {
-            "employment_type": "full time",
-            "remote": "false",
-            "location": "New York",
-            "search": "ethereum web3",
-        }
+        params = {}
+        if full_time:
+            params["employment_type"] = "full time"
+        if contract:
+            params["employment_type"] = "contract"
+        if part_time:
+            params["employment_type"] = "contract"
+        if remote:
+            params["remote"] = "true"
+        if location:
+            if country:
+                params["location"] = country
+                if city:
+                    params["location"] += f", {city}"
+            elif city:
+                params["location"] = city
+        params["search"] = job_title
 
         find_work_job_offers = find_work.get_jobs(params)
-        jobs_offers[FINDWORK] = find_work_job_offers
+        if isinstance(find_work_job_offers, dict):
+            jobs_offers[FINDWORK] = find_work_job_offers
     ####################################################
     if REED_CO_UK in jobs_providers:
         job_statistics_manager.api_name = REED_CO_UK
