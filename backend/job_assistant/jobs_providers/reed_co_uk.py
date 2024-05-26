@@ -15,6 +15,9 @@ from job_assistant.constants import REED_CO_UK_SECRET_KEY
 LOGGER = logging.getLogger(__name__)
 API_URL = "https://www.reed.co.uk/api/1.0/search"
 RESULTS_PER_PAGE = 100
+ABS_MIN_SALARY = 1_000_000
+ABS_MAX_SALARY = 0
+SALARY_PER_YEAR = 10_000
 
 
 class ReedCoUk:
@@ -35,9 +38,7 @@ class ReedCoUk:
         Args:
             job_title (str): Job title.
 
-        TODO:
-        add pages to get more than 100 results
-        save jobs per currency
+        TODO: add pages to get more than 100 results
         """
         params = {
             "fullTime": "true",
@@ -57,15 +58,15 @@ class ReedCoUk:
                 if currency not in salaries_data:
                     salaries_data[currency] = {
                         "all_salaries": [],
-                        "abs_min_salary": 1_000_000,
-                        "abs_max_salary": 0,
+                        "abs_min_salary": ABS_MIN_SALARY,
+                        "abs_max_salary": ABS_MAX_SALARY,
                     }
 
                 max_salary = job["maximumSalary"]
                 min_salary = job["minimumSalary"]
                 if max_salary is not None and min_salary is not None:
                     # sometimes salary is the pay per day
-                    if max_salary > 10_000 and min_salary > 10_000:
+                    if max_salary > SALARY_PER_YEAR and min_salary > SALARY_PER_YEAR:
                         all_salaries: list = salaries_data[currency]["all_salaries"]
                         all_salaries.append(max_salary)
                         all_salaries.append(min_salary)

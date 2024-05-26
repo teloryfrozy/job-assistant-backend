@@ -59,7 +59,7 @@ class JobStatisticsManager:
     def store_salaries_statistics(
         self,
         job_title: str,
-        salaries_data: dict[str: dict[str: list]],
+        salaries_data: dict[str : dict[str:list]],
     ) -> None:
         """
         Computes statistics from salary data and stores them in a structured JSON file on Google Drive.
@@ -87,19 +87,27 @@ class JobStatisticsManager:
             )
             return
 
-        stats_data = {
-            "std_dev": int(np.std(all_salaries)),
-            "kurtosis": float(stats.kurtosis(all_salaries)),
-            "skewness": float(stats.skew(all_salaries)),
-            "avg": int(np.mean(all_salaries)),
-        }
+        json_data[date][self.api_name][job_title] = {}
+        for currency in salaries_data:
+            currency_data: dict = salaries_data[currency]
+            all_salaries = currency_data["all_salaries"]
+            min_salary = currency_data.get("abs_min_salary")
+            max_salary = currency_data.get("abs_max_salary")
 
-        if min_salary is not None:
-            stats_data["min"] = min_salary
-        if max_salary is not None:
-            stats_data["max"] = max_salary
+            stats_data = {
+                "std_dev": int(np.std(all_salaries)),
+                "kurtosis": float(stats.kurtosis(all_salaries)),
+                "skewness": float(stats.skew(all_salaries)),
+                "avg": int(np.mean(all_salaries)),
+            }
 
-        json_data[date][self.api_name][job_title] = stats_data
+            if min_salary is not None:
+                stats_data["min"] = min_salary
+            if max_salary is not None:
+                stats_data["max"] = max_salary
+
+            json_data[date][self.api_name][job_title][currency] = stats_data
+
         self.gdrive_manager.overwrite_json_file(json_data, STATS_SALARIES_FILE_ID)
         LOGGER.info(
             f"{Fore.GREEN}Salaries statistics stored for {job_title} for API: {self.api_name} on {date}"
