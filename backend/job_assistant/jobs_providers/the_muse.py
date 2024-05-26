@@ -12,7 +12,7 @@ Important information:
 
 import logging
 import requests
-from backend.job_assistant.jobs_providers.job_statistics import JobStatisticsManager
+from job_assistant.jobs_providers.job_statistics import JobStatisticsManager
 
 
 ######################## LOGGING CONFIGURATION ########################

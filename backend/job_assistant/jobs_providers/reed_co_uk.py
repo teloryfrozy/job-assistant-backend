@@ -7,8 +7,8 @@ Documentation: https://www.reed.co.uk/developers/jobseeker
 
 import logging
 import requests
-from backend.job_assistant.jobs_providers.job_statistics import JobStatisticsManager
-from backend.job_assistant.constants import REED_CO_UK_SECRET_KEY
+from job_assistant.jobs_providers.job_statistics import JobStatisticsManager
+from job_assistant.constants import REED_CO_UK_SECRET_KEY
 
 
 ######################## LOGGING CONFIGURATION ########################

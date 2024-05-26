@@ -4,12 +4,10 @@ Environment creds and others constants
 TODO:
 Constants defined here should be used in at least 2 differents files or they are secrets coming from .env file
 Otherwise they should be defined locally
+# TODO: organize banner and constants
 """
 
 import os
-
-# TODO: organize banner and constants
-# TODO: create a FOLDER: "constants" and a file for job constants
 
 
 ######################## SECURITY ########################

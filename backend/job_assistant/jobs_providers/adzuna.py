@@ -7,8 +7,8 @@ Documentation: https://developer.adzuna.com/overview
 
 import logging
 import requests
-from backend.job_assistant.jobs_providers.job_statistics import JobStatisticsManager
-from backend.job_assistant.constants import ADZUNA_APP_ID, ADZUNA_SECRET_KEY
+from job_assistant.jobs_providers.job_statistics import JobStatisticsManager
+from job_assistant.constants import ADZUNA_APP_ID, ADZUNA_SECRET_KEY
 
 
 ADZUNA_API = "https://api.adzuna.com/v1/api/"

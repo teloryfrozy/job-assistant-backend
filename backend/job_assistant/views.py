@@ -9,20 +9,20 @@ import logging
 from django.http import HttpRequest, JsonResponse
 from rest_framework.decorators import api_view
 
-from backend.job_assistant.constants import (
+from job_assistant.constants import (
     ADZUNA,
     ARBEIT_NOW,
     FINDWORK,
     REED_CO_UK,
     THE_MUSE,
 )
-from backend.job_assistant.gdrive import GoogleDriveManager
-from backend.job_assistant.jobs_providers.adzuna import Adzuna
-from backend.job_assistant.jobs_providers.arbeitnow import ArbeitNow
-from backend.job_assistant.jobs_providers.findwork import FindWork
-from backend.job_assistant.jobs_providers.job_statistics import JobStatisticsManager
-from backend.job_assistant.jobs_providers.reed_co_uk import ReedCoUk
-from backend.job_assistant.jobs_providers.the_muse import TheMuse
+from job_assistant.gdrive import GoogleDriveManager
+from job_assistant.jobs_providers.adzuna import Adzuna
+from job_assistant.jobs_providers.arbeitnow import ArbeitNow
+from job_assistant.jobs_providers.findwork import FindWork
+from job_assistant.jobs_providers.job_statistics import JobStatisticsManager
+from job_assistant.jobs_providers.reed_co_uk import ReedCoUk
+from job_assistant.jobs_providers.the_muse import TheMuse
 
 ######################## LOGGING CONFIGURATION ########################
 LOGGER = logging.getLogger(__name__)

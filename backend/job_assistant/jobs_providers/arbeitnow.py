@@ -11,7 +11,7 @@ Features:
 import logging
 import requests
 from datetime import datetime
-from backend.job_assistant.jobs_providers.job_statistics import JobStatisticsManager
+from job_assistant.jobs_providers.job_statistics import JobStatisticsManager
 
 ######################## LOGGING CONFIGURATION ########################
 LOGGER = logging.getLogger(__name__)

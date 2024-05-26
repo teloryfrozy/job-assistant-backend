@@ -30,8 +30,8 @@ import numpy as np
 from scipy import stats
 from colorama import Fore, init
 import logging
-from backend.job_assistant.gdrive import GoogleDriveManager
-from backend.job_assistant.constants import (
+from job_assistant.gdrive import GoogleDriveManager
+from job_assistant.constants import (
     STATS_NUMBER_OFFERS_FILE_ID,
     STATS_SALARIES_FILE_ID,
 )

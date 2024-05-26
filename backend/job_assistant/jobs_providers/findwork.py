@@ -10,8 +10,8 @@ Important information:
 
 import logging
 import requests
-from backend.job_assistant.constants import FINDWORK_SECRET_KEY
-from backend.job_assistant.jobs_providers.job_statistics import JobStatisticsManager
+from job_assistant.constants import FINDWORK_SECRET_KEY
+from job_assistant.jobs_providers.job_statistics import JobStatisticsManager
 
 ######################## LOGGING CONFIGURATION ########################
 LOGGER = logging.getLogger(__name__)

@@ -31,4 +31,4 @@ uritemplate
 urllib3
 django-crontab
 colorama
-PyPDF2
+pypdf

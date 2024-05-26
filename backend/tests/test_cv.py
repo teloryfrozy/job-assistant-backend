@@ -1,4 +1,4 @@
-import PyPDF2
+import pypdf
 
 
 def extract_keywords(pdf_file_path: str) -> str:
@@ -13,16 +13,15 @@ def extract_keywords(pdf_file_path: str) -> str:
     """
     text_keywords = ""
     with open(pdf_file_path, "rb") as file:
-        pdf_reader = PyPDF2.PdfReader(file)
+        pdf_reader = pypdf.PdfReader(file)
         for page in pdf_reader.pages:
             text = page.extract_text()
-            text_keywords += text
+            if text:  # Check if text extraction was successful
+                text_keywords += text
     return text_keywords.strip()
 
 
-"""
 # Example usage
-pdf_file_path = "backend/tests/resume_Augustin_ROLET.pdf"
+pdf_file_path = "tests/resume_Augustin_ROLET.pdf"
 text_keywords = extract_keywords(pdf_file_path)
 print(text_keywords)
-"""
