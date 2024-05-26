@@ -177,9 +177,8 @@ def get_jobs(request: HttpRequest):
     contract: bool = parameters.get("contract")
     part_time: bool = parameters.get("part_time")
     remote: bool = parameters.get("remote")
-    number_offers: int = parameters.get(
-        "number_offers"
-    )  # just to be quicker if poor connection
+    temporary: bool = parameters.get("temporary")
+    graduate: bool = parameters.get("graduate")
 
     jobs_offers = {}
 
@@ -212,7 +211,6 @@ def get_jobs(request: HttpRequest):
             jobs_offers[ADZUNA] = adzuna_job_offers
 
     ####################################################
-
     if FINDWORK in jobs_providers:
         job_statistics_manager.api_name = FINDWORK
         find_work = FindWork(job_statistics_manager)
@@ -246,9 +244,22 @@ def get_jobs(request: HttpRequest):
         params = {
             "keywords": job_title,
             "minimumSalary": min_salary,
+            "maximumSalary": max_salary,
             "fullTime": full_time,
-            "locationName": country,
+            "partTime": part_time,
+            "permanent": permanent,
+            "contract": contract,
+            "temp": temporary,
+            "graduate": graduate,
         }
+
+        if location:
+            if country:
+                params["locationName"] = country
+                if city:
+                    params["locationName"] += f", {city}"
+            elif city:
+                params["locationName"] = city
 
         reed_co_uk_job_offers = reed_co_uk.get_jobs(params)
         if isinstance(reed_co_uk_job_offers, dict):

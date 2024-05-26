@@ -13,11 +13,8 @@ from job_assistant.constants import REED_CO_UK_SECRET_KEY
 
 ######################## LOGGING CONFIGURATION ########################
 LOGGER = logging.getLogger(__name__)
-
-
-RESULTS_PER_PAGE = 100
-
 API_URL = "https://www.reed.co.uk/api/1.0/search"
+RESULTS_PER_PAGE = 100
 
 
 class ReedCoUk:
