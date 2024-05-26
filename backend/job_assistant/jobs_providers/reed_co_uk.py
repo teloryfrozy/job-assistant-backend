@@ -2,7 +2,7 @@
 Reed.co.uk API Interaction Module
 
 This module is designed to interact with the Reed.co.uk API to fetch and analyze job salary data.
-Documentation: https://www.reed.co.uk/developers/jobseeker
+Documentation: https://www.reed.co.uk/developers/jobseeker 
 """
 
 import logging
@@ -34,6 +34,10 @@ class ReedCoUk:
 
         Args:
             job_title (str): Job title.
+
+        TODO:
+        add pages to get more than 100 results
+        save jobs per currency
         """
         params = {
             "fullTime": "true",
@@ -45,31 +49,40 @@ class ReedCoUk:
         )
 
         if response.status_code == 200:
+            salaries_data = {}
             data = response.json()
-            all_salaries = []
-            abs_min_salary = 1_000_000
-            abs_max_salary = 0
 
             for job in data["results"]:
+                currency = job["currency"]
+                if currency not in salaries_data:
+                    salaries_data[currency] = {
+                        "all_salaries": [],
+                        "abs_min_salary": 1_000_000,
+                        "abs_max_salary": 0,
+                    }
+
                 max_salary = job["maximumSalary"]
                 min_salary = job["minimumSalary"]
                 if max_salary is not None and min_salary is not None:
                     # sometimes salary is the pay per day
                     if max_salary > 10_000 and min_salary > 10_000:
+                        all_salaries: list = salaries_data[currency]["all_salaries"]
                         all_salaries.append(max_salary)
                         all_salaries.append(min_salary)
 
-                        if max_salary > abs_max_salary:
-                            abs_max_salary = max_salary
-                        if min_salary < abs_min_salary:
-                            abs_min_salary = min_salary
+                        if max_salary > salaries_data[currency]["abs_max_salary"]:
+                            salaries_data[currency]["abs_max_salary"] = max_salary
+                        if min_salary < salaries_data[currency]["abs_min_salary"]:
+                            salaries_data[currency]["abs_min_salary"] = min_salary
 
                         if max_salary and min_salary:
                             all_salaries.extend([max_salary, min_salary])
 
-            if all_salaries:
+                        salaries_data[currency]["all_salaries"] = all_salaries
+
+            if salaries_data:
                 self.job_statistics_manager.store_salaries_statistics(
-                    job_title, all_salaries, abs_min_salary, abs_max_salary
+                    job_title, salaries_data
                 )
             else:
                 LOGGER.error("No salary data available for the given job title.")
@@ -142,6 +155,7 @@ class ReedCoUk:
                 results: dict = json_data["results"]
 
                 for result in results:
+                    print(result)
                     job_info = {
                         "title": result["jobTitle"],
                         "min_salary": result["minimumSalary"],

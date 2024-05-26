@@ -15,6 +15,7 @@ from job_assistant.constants import ADZUNA_APP_ID, ADZUNA_SECRET_KEY
 LOGGER = logging.getLogger(__name__)
 ADZUNA_API = "https://api.adzuna.com/v1/api/"
 RESULTS_PER_PAGE = 50
+CURRENCY = "GBP"
 ADZUNA_COUNTRY_EXTENSIONS = [
     "gb",
     "us",
@@ -43,6 +44,8 @@ class Adzuna:
     Class for interacting with the Adzuna API and performing statistical analysis on job salaries.
 
     # TODO: add def set_number_offers(self, job_title: str) -> None: method
+
+    # TODO: set_salaries_stats per country in an other function (and place of storage in gdrive)
     """
 
     def __init__(self, job_statistics_manager: JobStatisticsManager = None) -> None:
@@ -76,7 +79,6 @@ class Adzuna:
 
         Args:
             job (str): Job title.
-            skills (list): List of skills required for the job.
         """
 
         def get_avg_salary_country(country: str) -> int:
@@ -97,6 +99,9 @@ class Adzuna:
                 data = response.json()
                 salary: int = data["salary"]
                 return salary
+            elif response.status_code == 404:
+                LOGGER.info(f"No salary data found for job {job} in country {country}.")
+                return None
             else:
                 error_msg = f"Failed to retrieve average salary for country {country}. "
                 error_msg += (
@@ -105,22 +110,18 @@ class Adzuna:
                 LOGGER.error(error_msg)
                 return None
 
-        data = {}
-        countries = ["gb", "us"]
+        salaries_data = {}
+        countries = ADZUNA_COUNTRY_EXTENSIONS
         all_salaries = []
-        average = 0
-        nb_success = 0
 
         for country in countries:
             result = get_avg_salary_country(country)
             if result:
-                nb_success += 1
-                average += result
                 all_salaries.append(result)
-                data[country] = result
+                salaries_data[CURRENCY] = result
 
         if all_salaries:
-            self.job_statistics_manager.store_salaries_statistics(job, all_salaries)
+            self.job_statistics_manager.store_salaries_statistics(job, salaries_data)
 
     def set_number_offers(
         self,

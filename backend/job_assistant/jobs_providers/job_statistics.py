@@ -59,18 +59,14 @@ class JobStatisticsManager:
     def store_salaries_statistics(
         self,
         job_title: str,
-        all_salaries: list,
-        min_salary: int = None,
-        max_salary: int = None,
+        salaries_data: dict[str: dict[str: list]],
     ) -> None:
         """
         Computes statistics from salary data and stores them in a structured JSON file on Google Drive.
 
         Args:
             job_title (str): The title of the job for which statistics are being calculated.
-            all_salaries (list): A list of salaries from which to calculate statistics.
-            min_salary (int, optional): The minimum salary for the job title. Defaults to None.
-            max_salary (int, optional): The maximum salary for the job title. Defaults to None.
+            salaries_data (dict[str: dict[str: list]]): A dictionary containing salary data for different currencies.
 
         Updates the JSON file on Google Drive with new statistics under the current date and API name.
         """
