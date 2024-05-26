@@ -1,0 +1,2 @@
+{"asctime": "2024-05-26 08:34:38", "name": "job_assistant.views", "lineno": 89, "levelname": "ERROR", "message": "An error occurred: Unsupported media type \"application/pdf\" in request."}
+{"asctime": "2024-05-26 08:34:41", "name": "job_assistant.views", "lineno": 89, "levelname": "ERROR", "message": "An error occurred: Unsupported media type \"application/pdf\" in request."}

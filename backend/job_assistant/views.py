@@ -9,6 +9,7 @@ import logging
 from django.http import HttpRequest, JsonResponse
 from rest_framework.decorators import api_view
 
+from job_assistant import pdf_manager
 from job_assistant.constants import (
     ADZUNA,
     ARBEIT_NOW,
@@ -23,6 +24,7 @@ from job_assistant.jobs_providers.findwork import FindWork
 from job_assistant.jobs_providers.job_statistics import JobStatisticsManager
 from job_assistant.jobs_providers.reed_co_uk import ReedCoUk
 from job_assistant.jobs_providers.the_muse import TheMuse
+from job_assistant.llm_providers import awanllm
 
 ######################## LOGGING CONFIGURATION ########################
 LOGGER = logging.getLogger(__name__)
@@ -32,11 +34,59 @@ LOGGER = logging.getLogger(__name__)
 def test(request):
     return JsonResponse({"message": "Test successful"})
 
+@api_view(["POST"])
+def analyze_cv(request: HttpRequest):
+    try:
+        # Check Content-Type header
+        content_type = request.headers.get('Content-Type')
+        if content_type != 'application/pdf':
+            LOGGER.error("Unsupported file type: %s", content_type)
+            return JsonResponse(
+                {"error": "Unsupported file type"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Read the binary data from the request body
+        file_content = request.body
+
+        # Check file size (10MB = 10 * 1024 * 1024 bytes)
+        max_size = 10 * 1024 * 1024
+        if len(file_content) > max_size:
+            LOGGER.error("File too large: %s bytes", len(file_content))
+            return JsonResponse(
+                {"error": "File too large"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Extract keywords from the file content
+        keywords = pdf_manager.extract_keywords_from_bytes(file_content)
+
+        # Make the request with llm
+        user_data = awanllm.summarize_resume(keywords)
+
+        # TODO: save keywords in database
+
+        LOGGER.info("Keywords extracted and saved from CV successfully")
+        return JsonResponse(
+            {
+                "message": "Keywords extracted and saved from CV successfully",
+                "extracted_data": user_data,
+            },
+            status=status.HTTP_200_OK,
+        )
+    except Exception as e:
+        # TODO use f"" print everywhere"
+        LOGGER.error("An error occurred: %s", str(e))
+        return JsonResponse(
+            {"error": "An internal error occurred"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
 
 @api_view(["POST"])
 def get_jobs_arbeit_now(request: HttpRequest):
     """
-    TODO    
+    TODO
     """
     parameters: dict = json.loads(request.body)
     visa_sponsorship = parameters.get("visa_sponsorship")
@@ -50,8 +100,8 @@ def get_jobs_arbeit_now(request: HttpRequest):
     arbeit_now_job_offers = arbeit_now.get_jobs(visa_sponsorship)
     jobs_offers[ARBEIT_NOW] = arbeit_now_job_offers
 
-
     return JsonResponse({"offers": arbeit_now_job_offers}, status=status.HTTP_200_OK)
+
 
 @api_view(["POST"])
 def get_jobs(request: HttpRequest):

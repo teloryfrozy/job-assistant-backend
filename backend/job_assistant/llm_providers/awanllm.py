@@ -20,18 +20,8 @@ add tools to the ai such as checking the number of github contributions to verif
 import re
 import requests
 import json
-from colorama import Fore, init
 
-import sys
-import os
-
-
-sys.path.append(
-    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
-)
-
-
-from backend.job_assistant.constants import (
+from job_assistant.constants import (
     AWANLLM_SECRET_KEY,
 )
 
@@ -42,8 +32,6 @@ HEADERS = {
     "Content-Type": "application/json",
     "Authorization": f"Bearer {AWANLLM_SECRET_KEY}",
 }
-
-init(autoreset=True)
 
 
 def get_response(prompt: str) -> str:
@@ -114,8 +102,8 @@ def summarize_resume(keywords: str) -> dict:
     }}
     """
     clear_text = get_response(template)
-    print(f"{Fore.GREEN}============ DEBUGGING RESUME SUMMARY ============")
-    print(f"{Fore.YELLOW}{clear_text}")
+    print(f"============ DEBUGGING RESUME SUMMARY ============")
+    print(clear_text)
 
     pattern = r"```(.*?)```"
     matches = re.findall(pattern, clear_text, re.DOTALL)

@@ -5,15 +5,15 @@ QUICK-START DEVELOPMENT SETTINGS - UNSUITABLE FOR PRODUCTION
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 """
 
-import sys
-import os
+# import sys
+# import os
 
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 from pathlib import Path
 from datetime import timedelta
-from backend.job_assistant.constants import DJANGO_SECRET_KEY
+from job_assistant.constants import DJANGO_SECRET_KEY
 
 
 ######################## GENERAL CONFIGURATION ########################
