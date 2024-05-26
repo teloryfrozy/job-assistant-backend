@@ -38,30 +38,37 @@ def test(request):
 @api_view(["POST"])
 def analyze_cv(request: HttpRequest):
     try:
-        # Check Content-Type header
         content_type = request.headers.get("Content-Type")
         if content_type != "application/pdf":
-            LOGGER.error("Unsupported file type: %s", content_type)
+            LOGGER.error(f"Unsupported file type: {content_type}")
             return JsonResponse(
                 {"error": "Unsupported file type"}, status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Read the binary data from the request body
         file_content = request.body
 
         # Check file size (10MB = 10 * 1024 * 1024 bytes)
         max_size = 10 * 1024 * 1024
         if len(file_content) > max_size:
-            LOGGER.error("File too large: %d bytes", len(file_content))
+            LOGGER.error(f"File too large: {len(file_content)} bytes")
             return JsonResponse(
                 {"error": "File too large"}, status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Extract keywords from the file content
         keywords = pdf_manager.extract_keywords_from_bytes(file_content)
 
-        # Make the request with llm
-        user_data = awanllm.summarize_resume(keywords)
+        try:
+            user_data = awanllm.summarize_resume(keywords)
+        except json.JSONDecodeError as e:
+            return JsonResponse(
+                {"error": "AI failed to return a proper JSON format"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+        except Exception as e:
+            return JsonResponse(
+                {"error": f"An error occurred during CV analysis: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
         # TODO: save keywords in database
 
@@ -74,9 +81,9 @@ def analyze_cv(request: HttpRequest):
             status=status.HTTP_200_OK,
         )
     except Exception as e:
-        LOGGER.exception("An error occurred during CV analysis: %s", e)
+        LOGGER.exception(f"An error occurred during CV analysis: {str(e)}")
         return JsonResponse(
-            {"error": "An internal error occurred"},
+            {"error": f"An error occurred during CV analysis: {str(e)}"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
