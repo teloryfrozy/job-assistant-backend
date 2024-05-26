@@ -178,5 +178,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # the path is correct when exec from terminal but does not work console 🫥
 CRONJOBS = [
     ("*/1 * * * *", "core.cron.dummy_task"),
+    ("0 3 * * SUN", "core.cron.adzuna_run"),  # At 03:00 on Sunday
+    ("0 3 * * SUN", "core.cron.reed_co_uk_run"),  # At 03:00 on Sunday
     ("0 3 * * SUN", "core.cron.collect_job_data"),  # At 03:00 on Sunday
 ]

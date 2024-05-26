@@ -118,9 +118,9 @@ class Adzuna:
             result = get_avg_salary_country(country)
             if result:
                 all_salaries.append(result)
-                salaries_data[CURRENCY] = result
+        salaries_data[CURRENCY] = {"all_salaries": all_salaries}
 
-        if all_salaries:
+        if salaries_data:
             self.job_statistics_manager.store_salaries_statistics(job, salaries_data)
 
     def set_number_offers(

@@ -107,12 +107,12 @@ class JobStatisticsManager:
                 stats_data["max"] = max_salary
 
             json_data[date][self.api_name][job_title][currency] = stats_data
-
+        print(json_data)
         self.gdrive_manager.overwrite_json_file(json_data, STATS_SALARIES_FILE_ID)
         LOGGER.info(
             f"{Fore.GREEN}Salaries statistics stored for {job_title} for API: {self.api_name} on {date}"
         )
-
+        
     def store_number_offers(self, job_title: str, number_offers: int) -> None:
         """
         Stores the number of job offers for a given job title on the current date, associated with a specific API.
