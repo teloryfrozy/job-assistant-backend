@@ -138,8 +138,11 @@ def get_jobs(request: HttpRequest):
         country: str = location.get("country")
     min_salary: int = parameters.get("min_salary")
     max_salary: int = parameters.get("max_salary")
+    max_days_old: int = parameters.get("max_days_old")
     full_time: bool = parameters.get("full_time")
     permanent: bool = parameters.get("permanent")
+    contract: bool = parameters.get("contract")
+    part_time: bool = parameters.get("part_time")
     remote: bool = parameters.get("remote")
     number_offers: int = parameters.get(
         "number_offers"
@@ -158,15 +161,19 @@ def get_jobs(request: HttpRequest):
 
         params = {
             "what": job_title,
-            # "where": city,
-            # "sort_by": "salary",
             "salary_min": min_salary,
+            "salary_max": max_salary,
         }
+
+        if contract:
+            params["contract"] = 1
         if full_time:
             params["full_time"] = 1
         if permanent:
             params["permanent"] = 1
-        
+        if part_time:
+            params["part_time"] = 1
+
         adzuna_job_offers = adzuna.get_jobs(country, params)
         if isinstance(adzuna_job_offers, dict):
             jobs_offers[ADZUNA] = adzuna_job_offers

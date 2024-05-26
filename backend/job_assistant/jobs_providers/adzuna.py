@@ -11,6 +11,8 @@ from job_assistant.jobs_providers.job_statistics import JobStatisticsManager
 from job_assistant.constants import ADZUNA_APP_ID, ADZUNA_SECRET_KEY
 
 
+######################## LOGGING CONFIGURATION ########################
+LOGGER = logging.getLogger(__name__)
 ADZUNA_API = "https://api.adzuna.com/v1/api/"
 RESULTS_PER_PAGE = 50
 ADZUNA_COUNTRY_EXTENSIONS = [
@@ -34,10 +36,6 @@ ADZUNA_COUNTRY_EXTENSIONS = [
     "sg",
     "za",
 ]
-
-
-######################## LOGGING CONFIGURATION ########################
-LOGGER = logging.getLogger(__name__)
 
 
 class Adzuna:
@@ -234,3 +232,16 @@ class Adzuna:
                     data["results"].append(job_info)
 
         return data
+
+    """
+get jobs/{country}/top_companies
+
+    List the top employers for the search terms supplied
+    json_data: dict = response.json()
+    "leaderboard": list = json_data[""leaderboard"]
+    just return  leaderboard
+
+
+    add in the documenation that the list is sorted by the number of job offers aka 1st = most job offers
+
+"""
