@@ -166,9 +166,10 @@ def get_jobs(request: HttpRequest):
             params["full_time"] = 1
         if permanent:
             params["permanent"] = 1
-
+        
         adzuna_job_offers = adzuna.get_jobs(country, params)
-        jobs_offers[ADZUNA] = adzuna_job_offers
+        if isinstance(adzuna_job_offers, dict):
+            jobs_offers[ADZUNA] = adzuna_job_offers
 
     ####################################################
 

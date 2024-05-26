@@ -163,6 +163,9 @@ class Adzuna:
         data = {}
         data["results"] = []
 
+        if not country in ADZUNA_COUNTRY_EXTENSIONS:
+            return f"Country {country} is not supported by Adzuna API."
+
         url = f"{ADZUNA_API}jobs/{country}/search/{1}?"
         response = requests.get(url, params=params)
 

@@ -17,7 +17,6 @@ from googleapiclient.http import MediaIoBaseUpload
 
 # TODO: Remove all comments. Keep only the documentation.
 
-
 # TODO: add clean logging INSTEAD of debug prints (very important)
 
 
