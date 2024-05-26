@@ -100,6 +100,39 @@ def analyze_cv(request: HttpRequest):
 
 
 @api_view(["POST"])
+def get_top_companies(request: HttpRequest):
+    """
+    Get the top companies for a specific country and job category.
+
+    Parameters:
+        - request (HttpRequest): The HTTP request object containing the country and category parameters.
+
+    Returns:
+        JsonResponse: A JSON response containing the top companies or an error message.
+    """
+    parameters: dict = json.loads(request.body)
+    country: str = parameters.get("country")
+    category: str = parameters.get("category")
+
+    if not country:
+        return JsonResponse(
+            {"error": "Country is required"}, status=status.HTTP_400_BAD_REQUEST
+        )
+    if not category:
+        return JsonResponse(
+            {"error": "Category is required"}, status=status.HTTP_400_BAD_REQUEST
+        )
+
+    top_companies = Adzuna().get_top_companies(country, category)
+    if isinstance(top_companies, list):
+        return JsonResponse({"top_companies": top_companies}, status=status.HTTP_200_OK)
+    else:
+        return JsonResponse(
+            {"error": top_companies}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(["POST"])
 def get_jobs_arbeit_now(request: HttpRequest):
     """
     TODO

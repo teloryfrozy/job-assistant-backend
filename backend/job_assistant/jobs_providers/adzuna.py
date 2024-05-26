@@ -45,7 +45,7 @@ class Adzuna:
     # TODO: add def set_number_offers(self, job_title: str) -> None: method
     """
 
-    def __init__(self, job_statistics_manager: JobStatisticsManager) -> None:
+    def __init__(self, job_statistics_manager: JobStatisticsManager = None) -> None:
         self.job_statistics_manager = job_statistics_manager
 
     def get_params(self, params: dict) -> dict:
@@ -233,15 +233,36 @@ class Adzuna:
 
         return data
 
-    """
-get jobs/{country}/top_companies
+    def get_top_companies(self, country: str, params: dict) -> list | str:
+        """
+        List the top employers for the search terms supplied, sorted by the number of job offers.
 
-    List the top employers for the search terms supplied
-    json_data: dict = response.json()
-    "leaderboard": list = json_data[""leaderboard"]
-    just return  leaderboard
+        Parameters:
+            - country (str): The country for which job offers are being queried.
+            - params (dict): A dictionary of parameters to modify the API request.
 
+        Returns:
+            list: List of top employers sorted by the number of job offers.
+            str: Error message if the request fails.
+        """
+        if len(params) > 1:
+            return "Only one parameter is allowed for this endpoint: 'what'"
+        if params.get("what") is None:
+            return "The 'what' parameter is required for this endpoint"
 
-    add in the documenation that the list is sorted by the number of job offers aka 1st = most job offers
+        params = self.get_params(params)
 
-"""
+        url = f"{ADZUNA_API}jobs/{country}/top_companies"
+        response = requests.get(url, params=params)
+
+        if response.status_code == 200:
+            json_data: dict = response.json()
+            leaderboard: list = json_data["leaderboard"]
+            return leaderboard
+        else:
+            error_msg = f"Failed to fetch jobs data from URL: {url}. "
+            error_msg += (
+                f"Status code: {response.status_code}, Reason: {response.reason}"
+            )
+            LOGGER.error(error_msg)
+            return error_msg
