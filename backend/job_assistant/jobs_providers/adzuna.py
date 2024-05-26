@@ -233,23 +233,19 @@ class Adzuna:
 
         return data
 
-    def get_top_companies(self, country: str, params: dict) -> list | str:
+    def get_top_companies(self, country: str, category: str) -> list | str:
         """
         List the top employers for the search terms supplied, sorted by the number of job offers.
 
         Parameters:
             - country (str): The country for which job offers are being queried.
-            - params (dict): A dictionary of parameters to modify the API request.
+            - category (str): The category of job offers to search for.
 
         Returns:
             list: List of top employers sorted by the number of job offers.
             str: Error message if the request fails.
         """
-        if len(params) > 1:
-            return "Only one parameter is allowed for this endpoint: 'what'"
-        if params.get("what") is None:
-            return "The 'what' parameter is required for this endpoint"
-
+        params = {"what": category}
         params = self.get_params(params)
 
         url = f"{ADZUNA_API}jobs/{country}/top_companies"
