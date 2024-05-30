@@ -100,6 +100,59 @@ def analyze_cv(request: HttpRequest):
 
 
 @api_view(["POST"])
+def match_applicant_to_job(request: HttpRequest):
+    """
+    Matches the applicant's skills to the job requirements and provides a matching score.
+
+    Expects:
+        Body: JSON object with the following fields:
+            - jobTitle (str): The title of the job.
+            - extractedData (dict): Summary of skills and experience extracted from the applicant's CV.
+            - jobDescription (str): Description of the job as a long text.
+
+    Responses:
+        200 OK: Successfully get the response from LLM.
+        400 Bad Request: Missing required fields.
+        500 Internal Server Error: Error during matching process.
+    """
+    try:
+        data: dict = json.loads(request.body)
+        job_title: str = data.get("jobTitle")
+        extracted_data: dict = data.get("extractedData")
+        job_description: str = data.get("jobDescription")
+
+        if not job_title:
+            return JsonResponse(
+                {"error": "Job title is required"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        if not extracted_data:
+            return JsonResponse(
+                {"error": "Extracted data is required"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        if not job_description:
+            return JsonResponse(
+                {"error": "Job description is required"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        match_result = awanllm.match_applicant_to_job(
+            job_title, extracted_data, job_description)
+        return JsonResponse(
+            {"matchResult": match_result},
+            status=status.HTTP_200_OK,
+        )
+    except json.JSONDecodeError:
+        return JsonResponse(
+            {"error": "AI failed to return a proper JSON format"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {"error": f"An error occurred during the matching process: {str(e)}"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+
+@api_view(["POST"])
 def get_top_companies(request: HttpRequest):
     """
     Get the top companies for a specific country and job category.

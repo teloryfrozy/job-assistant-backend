@@ -103,7 +103,7 @@ def summarize_resume(keywords: str) -> dict:
     """
     try:
         clear_text = get_response(template)
-
+        
         pattern = r"```(.*?)```"
         matches = re.findall(pattern, clear_text, re.DOTALL)
 
@@ -185,13 +185,13 @@ def match_applicant_to_job(job_title: str, extracted_data: dict, job_description
         return match_result
 
     except json.JSONDecodeError as e:
-        error_message = f"The AI failed to return a proper JSON format while match_applicant_to_job. \
+        error_message = f"The AI failed to return a proper JSON format while matching applicant to job. \
             Input token count: {count_tokens(template)}, Output token count: {count_tokens(clear_text)}. Error: {str(e)}"
         LOGGER.critical(error_message)
         raise json.JSONDecodeError(error_message, doc=clear_text, pos=0)
 
     except Exception as e:
-        error_message = f"Error match_applicant_to_job. Input token count: {count_tokens(template)}, \
+        error_message = f"Error while matching applicant to job. Input token count: {count_tokens(template)}, \
             Output token count: {count_tokens(clear_text)}. Error: {str(e)}"
         LOGGER.error(error_message)
         raise Exception(error_message)
