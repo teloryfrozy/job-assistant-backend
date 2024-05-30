@@ -1,15 +1,13 @@
 """
 QUICK-START DEVELOPMENT SETTINGS - UNSUITABLE FOR PRODUCTION
 
+TODO: clean this file by adding banners and removing django default comments
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 """
 
-# import sys
-# import os
 
-
-# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 from pathlib import Path
 from datetime import timedelta
@@ -175,10 +173,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # under developement (do not delete)
 # documentation: https://crontab.guru/
 
-# the path is correct when exec from terminal but does not work console 🫥
+# TODO: inside startup script add an external job that triggers django cronjobs from docker
 CRONJOBS = [
-    ("*/1 * * * *", "core.cron.dummy_task"),
-    ("0 3 * * SUN", "core.cron.adzuna_run"),  # At 03:00 on Sunday
-    ("0 3 * * SUN", "core.cron.reed_co_uk_run"),  # At 03:00 on Sunday
     ("0 3 * * SUN", "core.cron.collect_job_data"),  # At 03:00 on Sunday
 ]

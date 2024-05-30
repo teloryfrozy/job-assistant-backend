@@ -50,7 +50,9 @@ class FindWork:
             print(f"Error: {response.status_code} - {response.reason}")
 
     def get_jobs(self, params: dict) -> dict[str, list] | str:
-        """
+        """            
+        TODO: clean logging with a function (see arbeitnow.py)
+
         Fetches job data from the Adzuna API.
 
         Args:
@@ -60,19 +62,17 @@ class FindWork:
 
         Returns:
             list: List of job data.
-        """
-        
+        """        
         data = {}
         params["page"] = 1
 
         response = requests.get(API_URL, headers=self.headers, params=params)
         if response.status_code != 200:
-            # TODO: clean logging
             error_msg = (
                 f"Status code: {response.status_code}, Reason: {response.reason}"
             )
             LOGGER.error(error_msg)
-            return error_msg + "There was an error please display something to the user"
+            return error_msg 
 
         json_data: dict = response.json()
         number_offers = json_data["count"]
@@ -102,12 +102,11 @@ class FindWork:
                 response = requests.get(API_URL, headers=self.headers, params=params)
 
                 if response.status_code != 200:
-                    # TODO: clean logging
                     error_msg = f"PAGE: {i}, Status code: {response.status_code}, Reason: {response.reason}"
                     LOGGER.error(error_msg)
                     return (
                         error_msg
-                        + "There was an error please display something to the user"
+                        
                     )
 
                 json_data: dict = response.json()

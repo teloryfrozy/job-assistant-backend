@@ -16,27 +16,27 @@ LOGGER = logging.getLogger(__name__)
 ADZUNA_API = "https://api.adzuna.com/v1/api/"
 RESULTS_PER_PAGE = 50
 CURRENCY = "GBP"
-ADZUNA_COUNTRY_EXTENSIONS = [
-    "gb",
-    "us",
-    "at",
-    "au",
-    "be",
-    "br",
-    "ca",
-    "ch",
-    "de",
-    "es",
-    "fr",
-    "in",
-    "it",
-    "mx",
-    "nl",
-    "nz",
-    "pl",
-    "sg",
-    "za",
-]
+ADZUNA_COUNTRIES = {
+    "United Kingdom": "gb",
+    "United States": "us",
+    "Austria": "at",
+    "Australia": "au",
+    "Belgium": "be",
+    "Brazil": "br",
+    "Canada": "ca",
+    "Switzerland": "ch",
+    "Germany": "de",
+    "Spain": "es",
+    "France": "fr",
+    "India": "in",
+    "Italy": "it",
+    "Mexico": "mx",
+    "Netherlands": "nl",
+    "New Zealand": "nz",
+    "Poland": "pl",
+    "Singapore": "sg",
+    "South Africa": "za",
+}
 
 
 class Adzuna:
@@ -107,7 +107,7 @@ class Adzuna:
                 return None
 
         salaries_data = {}
-        countries = ADZUNA_COUNTRY_EXTENSIONS
+        countries = ADZUNA_COUNTRIES.values()
         all_salaries = []
 
         for country in countries:
@@ -150,6 +150,8 @@ class Adzuna:
     def get_jobs(self, country: str, params: dict) -> dict[str, list] | str:
         """
         TODO: clean doc as a senior backend python developer
+
+        TODO: clean logging with a function (see arbeitnow.py)
         """
         params = self.get_params(params)
         params["results_per_page"] = RESULTS_PER_PAGE
@@ -157,19 +159,20 @@ class Adzuna:
         data = {}
         data["results"] = []
 
-        if not country in ADZUNA_COUNTRY_EXTENSIONS:
+        country_code = ADZUNA_COUNTRIES.get(country)
+
+        if not country:
             return f"Country {country} is not supported by Adzuna API."
 
-        url = f"{ADZUNA_API}jobs/{country}/search/{1}?"
+        url = f"{ADZUNA_API}jobs/{country_code}/search/{1}?"
         response = requests.get(url, params=params)
 
         if response.status_code != 200:
-            # TODO: clean logging
             error_msg = (
                 f"Status code: {response.status_code}, Reason: {response.reason}"
             )
             LOGGER.error(error_msg)
-            return error_msg + "There was an error please display something to the user"
+            return error_msg
 
         json_data: dict = response.json()
         number_offers = json_data["count"]
@@ -198,17 +201,13 @@ class Adzuna:
                 nb_pages += 1
 
             for i in range(2, nb_pages + 1):
-                url = f"{ADZUNA_API}jobs/{country}/search/{i}?"
+                url = f"{ADZUNA_API}jobs/{country_code}/search/{i}?"
                 response = requests.get(url, params=params)
 
                 if response.status_code != 200:
-                    # TODO: clean logging
                     error_msg = f"PAGE: {i}, Status code: {response.status_code}, Reason: {response.reason}"
                     LOGGER.error(error_msg)
-                    return (
-                        error_msg
-                        + "There was an error please display something to the user"
-                    )
+                    return error_msg
 
                 json_data: dict = response.json()
                 results: dict[dict] = json_data["results"]

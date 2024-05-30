@@ -78,6 +78,8 @@ class TheMuse:
     def get_jobs(self, params: dict) -> dict[str, list] | str:
         """
         TODO: clean doc as a senior backend python developer
+            
+        TODO: clean logging with a function (see arbeitnow.py)
         """
         
         data = {}
@@ -85,12 +87,11 @@ class TheMuse:
         response = requests.get(f"{API_URL}jobs", params=params)
 
         if response.status_code != 200:
-            # TODO: clean logging
             error_msg = (
                 f"Status code: {response.status_code}, Reason: {response.reason}"
             )
             LOGGER.error(error_msg)
-            return error_msg + "There was an error please display something to the user"
+            return error_msg 
 
         json_data: dict = response.json()
         number_offers = json_data["total"] if json_data["results"] != [] else 0
@@ -119,12 +120,11 @@ class TheMuse:
                 response = requests.get(f"{API_URL}jobs", params=params)
 
                 if response.status_code != 200:
-                    # TODO: clean logging
                     error_msg = f"PAGE: {i}, Status code: {response.status_code}, Reason: {response.reason}"
                     LOGGER.error(error_msg)
                     return (
                         error_msg
-                        + "There was an error please display something to the user"
+                        
                     )
 
                 json_data: dict = response.json()

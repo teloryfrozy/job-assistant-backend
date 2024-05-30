@@ -24,10 +24,6 @@ from job_assistant.jobs_providers.the_muse import TheMuse
 GOOGLE_DRIVE_MANAGER = GoogleDriveManager()
 
 
-def dummy_task():
-    print("Hello from dummy task!")
-
-
 def collect_job_data():
     """
     Runs all scheduled tasks to collect and store job market data.
