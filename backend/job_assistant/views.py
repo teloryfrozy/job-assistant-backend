@@ -4,6 +4,7 @@ Handles API calls to our rest api for now
 """
 
 import json
+import threading
 from rest_framework import status
 import logging
 from django.http import HttpRequest, JsonResponse
@@ -155,8 +156,54 @@ def get_jobs_arbeit_now(request: HttpRequest):
 @api_view(["POST"])
 def get_jobs(request: HttpRequest):
     """
-    TODO: clean doc as a senior Python developer with 20 years of experience of that function get_jobs
+    Handle job search requests by querying multiple job providers and aggregating the results.
     """
+    results = {}
+
+    def fetch_adzuna_jobs(params):
+        job_statistics_manager.api_name = ADZUNA
+        adzuna = Adzuna(job_statistics_manager)
+        adzuna_job_offers = adzuna.get_jobs(country, params)
+        if isinstance(adzuna_job_offers, dict):
+            results[ADZUNA] = adzuna_job_offers
+        else:
+            LOGGER.error(
+                f"Failed to fetch jobs data from Adzuna API: {adzuna_job_offers}"
+            )
+
+    def fetch_findwork_jobs(params):
+        job_statistics_manager.api_name = FINDWORK
+        find_work = FindWork(job_statistics_manager)
+        find_work_job_offers = find_work.get_jobs(params)
+        if isinstance(find_work_job_offers, dict):
+            results[FINDWORK] = find_work_job_offers
+        else:
+            LOGGER.error(
+                f"Failed to fetch jobs data from FindWork API: {find_work_job_offers}"
+            )
+
+    def fetch_reed_jobs(params):
+        job_statistics_manager.api_name = REED_CO_UK
+        reed_co_uk = ReedCoUk(job_statistics_manager)
+        reed_co_uk_job_offers = reed_co_uk.get_jobs(params)
+        if isinstance(reed_co_uk_job_offers, dict):
+            results[REED_CO_UK] = reed_co_uk_job_offers
+        else:
+            LOGGER.error(
+                f"Failed to fetch jobs data from Reed Co UK API: {reed_co_uk_job_offers}"
+            )
+
+    def fetch_the_muse_jobs(params):
+        job_statistics_manager.api_name = THE_MUSE
+        the_muse = TheMuse(job_statistics_manager)
+        the_muse_job_offers = the_muse.get_jobs(params)
+        if isinstance(the_muse_job_offers, dict):
+            results[THE_MUSE] = the_muse_job_offers
+        else:
+            LOGGER.error(
+                f"Failed to fetch jobs data from The Muse API: {the_muse_job_offers}"
+            )
+
     parameters: dict = json.loads(request.body)
 
     job_title: str = parameters["job_title"]
@@ -182,78 +229,61 @@ def get_jobs(request: HttpRequest):
 
     jobs_offers = {}
 
+    threads: list[threading.Thread] = []
     GOOGLE_DRIVE_MANAGER = GoogleDriveManager()
     job_statistics_manager = JobStatisticsManager(GOOGLE_DRIVE_MANAGER, ADZUNA)
 
-    # TODO: USE functions to split the code
-    # TODO: use thread to increase speed
     ####################################################
     if ADZUNA in jobs_providers:
-        job_statistics_manager.api_name = ADZUNA
-        adzuna = Adzuna(job_statistics_manager)
-
-        params = {
+        adzuna_params = {
             "what": job_title,
             "salary_min": min_salary,
             "salary_max": max_salary,
         }
         if max_days_old:
-            params["max_days_old"] = max_days_old
+            adzuna_params["max_days_old"] = max_days_old
         if skills:
-            params["description"] = ",".join(skills)
+            adzuna_params["description"] = ",".join(skills)
         if contract:
-            params["contract"] = 1
+            adzuna_params["contract"] = 1
         if full_time:
-            params["full_time"] = 1
+            adzuna_params["full_time"] = 1
         if permanent:
-            params["permanent"] = 1
+            adzuna_params["permanent"] = 1
         if part_time:
-            params["part_time"] = 1
-
-        adzuna_job_offers = adzuna.get_jobs(country, params)
-        if isinstance(adzuna_job_offers, dict):
-            jobs_offers[ADZUNA] = adzuna_job_offers
-        else:
-            LOGGER.error(
-                f"Failed to fetch jobs data from Adzuna API: {adzuna_job_offers}"
-            )
+            adzuna_params["part_time"] = 1
+        adzuna_thread = threading.Thread(
+            target=fetch_adzuna_jobs, args=(adzuna_params,)
+        )
+        threads.append(adzuna_thread)
 
     ####################################################
     if FINDWORK in jobs_providers:
-        job_statistics_manager.api_name = FINDWORK
-        find_work = FindWork(job_statistics_manager)
-
-        params = {}
+        findwork_params = {}
         if full_time:
-            params["employment_type"] = "full time"
+            findwork_params["employment_type"] = "full time"
         if contract:
-            params["employment_type"] = "contract"
+            findwork_params["employment_type"] = "contract"
         if part_time:
-            params["employment_type"] = "contract"
+            findwork_params["employment_type"] = "contract"
         if remote:
-            params["remote"] = "true"
+            findwork_params["remote"] = "true"
         if location:
             if country:
-                params["location"] = country
+                findwork_params["location"] = country
                 if city:
-                    params["location"] += f", {city}"
+                    findwork_params["location"] += f", {city}"
             elif city:
-                params["location"] = city
-        params["search"] = job_title
+                findwork_params["location"] = city
+        findwork_params["search"] = job_title
+        findwork_thread = threading.Thread(
+            target=fetch_findwork_jobs, args=(findwork_params,)
+        )
+        threads.append(findwork_thread)
 
-        find_work_job_offers = find_work.get_jobs(params)
-        if isinstance(find_work_job_offers, dict):
-            jobs_offers[FINDWORK] = find_work_job_offers
-        else:
-            LOGGER.error(
-                f"Failed to fetch jobs data from FindWork API: {find_work_job_offers}"
-            )
     ####################################################
     if REED_CO_UK in jobs_providers:
-        job_statistics_manager.api_name = REED_CO_UK
-        reed_co_uk = ReedCoUk(job_statistics_manager)
-
-        params = {
+        reed_params = {
             "keywords": job_title,
             "minimumSalary": min_salary,
             "maximumSalary": max_salary,
@@ -264,40 +294,32 @@ def get_jobs(request: HttpRequest):
             "temp": temporary,
             "graduate": graduate,
         }
-
         if location:
             if country:
-                params["locationName"] = country
+                reed_params["locationName"] = country
                 if city:
-                    params["locationName"] += f", {city}"
+                    reed_params["locationName"] += f", {city}"
             elif city:
-                params["locationName"] = city
+                reed_params["locationName"] = city
+        reed_thread = threading.Thread(target=fetch_reed_jobs, args=(reed_params,))
+        threads.append(reed_thread)
 
-        reed_co_uk_job_offers = reed_co_uk.get_jobs(params)
-        if isinstance(reed_co_uk_job_offers, dict):
-            jobs_offers[REED_CO_UK] = reed_co_uk_job_offers
-        else:
-            LOGGER.error(
-                f"Failed to fetch jobs data from Reed Co UK API: {reed_co_uk_job_offers}"
-            )
     ####################################################
     if THE_MUSE in jobs_providers:
-        job_statistics_manager.api_name = THE_MUSE
-        the_muse = TheMuse(job_statistics_manager)
-
-        params = {
+        muse_params = {
             "query": job_title,
             "level": levels,
             "category": categories,
             "location": location_list,
         }
+        muse_thread = threading.Thread(target=fetch_the_muse_jobs, args=(muse_params,))
+        threads.append(muse_thread)
 
-        the_muse_job_offers = the_muse.get_jobs(params)
-        if isinstance(the_muse_job_offers, dict):
-            jobs_offers[THE_MUSE] = the_muse_job_offers
-        else:
-            LOGGER.error(
-                f"Failed to fetch jobs data from The Muse API: {the_muse_job_offers}"
-            )
-    ####################################################
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+
+    jobs_offers.update(results)
+
     return JsonResponse({"offers": jobs_offers}, status=status.HTTP_200_OK)
