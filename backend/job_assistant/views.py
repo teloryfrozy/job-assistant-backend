@@ -117,9 +117,9 @@ def match_applicant_to_job(request: HttpRequest):
     """
     try:
         data: dict = json.loads(request.body)
-        job_title: str = data.get("jobTitle")
-        extracted_data: dict = data.get("extractedData")
-        job_description: str = data.get("jobDescription")
+        job_title: str = data.get("job_title")
+        extracted_data: dict = data.get("extracted_data")
+        job_description: str = data.get("job_description")
 
         if not job_title:
             return JsonResponse(

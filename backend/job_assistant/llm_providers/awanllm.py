@@ -103,7 +103,7 @@ def summarize_resume(keywords: str) -> dict:
     """
     try:
         clear_text = get_response(template)
-        
+
         pattern = r"```(.*?)```"
         matches = re.findall(pattern, clear_text, re.DOTALL)
 
@@ -149,7 +149,7 @@ def match_applicant_to_job(job_title: str, extracted_data: dict, job_description
     As a smart recruiter assistant from a tech company.
     1) Analyse if the summary of skills of the applicant matches the job requirements.
     2) Provide a score from 0 to 100% based on the match.
-    3) Add a brief explanation of the match if you think the applicant has little chance to be selected.
+    3) Add a brief explanation to the user by using 'You' to refer to the applicant explaining your choice.
     4) Ignore everything related to job description that is not about skills and experience to accurately match the applicant.
 
     Applicant information summary:
@@ -171,7 +171,6 @@ def match_applicant_to_job(job_title: str, extracted_data: dict, job_description
     """
     try:
         clear_text = get_response(template)
-        LOGGER.debug("Response from API: %s", clear_text)
 
         pattern = r"```(.*?)```"
         matches = re.findall(pattern, clear_text, re.DOTALL)
