@@ -105,8 +105,9 @@ def get_top_companies(request: HttpRequest):
     """
     Get the top companies for a specific country and job category.
 
-    Parameters:
-        - request (HttpRequest): The HTTP request object containing the country and category parameters.
+    This endpoint processes the following request parameters:
+    - country (str): The country for which to retrieve the top companies.
+    - category (str): The job category for which to retrieve the top companies.
 
     Returns:
         JsonResponse: A JSON response containing the top companies or an error message.
@@ -151,7 +152,7 @@ def get_jobs_arbeit_now(request: HttpRequest):
 
     arbeit_now = ArbeitNow(job_statistics_manager)
     arbeit_now_job_offers = arbeit_now.get_jobs(visa_sponsorship)
-    
+
     jobs_offers = {ARBEIT_NOW: arbeit_now_job_offers}
 
     return JsonResponse({"offers": jobs_offers}, status=status.HTTP_200_OK)
@@ -161,6 +162,28 @@ def get_jobs_arbeit_now(request: HttpRequest):
 def get_jobs(request: HttpRequest):
     """
     Handle job search requests by querying multiple job providers and aggregating the results.
+
+    This endpoint processes the following request parameters:
+    - job_title (str): The title of the job to search for.
+    - jobs_providers (list): List of job providers to query.
+    - level (list, optional): List of experience levels to filter by.
+    - skills (list, optional): List of skills to filter by.
+    - max_days_old (int, optional): Maximum age of job postings in days.
+    - categories (list, optional): List of job categories to filter by.
+    - location (dict, optional): Dictionary with city and country to filter by.
+    - location_list (list, optional): List of locations to filter by.
+    - min_salary (int, optional): Minimum salary to filter by.
+    - max_salary (int, optional): Maximum salary to filter by.
+    - full_time (bool, optional): Filter for full-time jobs.
+    - permanent (bool, optional): Filter for permanent jobs.
+    - contract (bool, optional): Filter for contract jobs.
+    - part_time (bool, optional): Filter for part-time jobs.
+    - remote (bool, optional): Filter for remote jobs.
+    - temporary (bool, optional): Filter for temporary jobs.
+    - graduate (bool, optional): Filter for graduate jobs.
+
+    Returns:
+        JsonResponse: A JSON response containing aggregated job offers from the specified job providers.
     """
     results = {}
 
