@@ -40,9 +40,6 @@ class ArbeitNow:
 
     def get_jobs(self, visa_sponsorship: bool | None) -> dict[str, list] | str:
         """
-        TODO: clean the duplicated code with functions
-        ⚠️ I already optimized the dichotomous search and chatGPT does not understand it => Do not touch the LOGIC ⚠️
-
         Fetch job listings from the ArbeitNow API.
 
         Args:
@@ -52,9 +49,15 @@ class ArbeitNow:
             A dictionary containing job listings and metadata, or an error message.
         """
 
-        data = {}
-        data["results"] = []
+        def log_and_return_error(response: requests.Response):
+            error_msg = (
+                f"Failed to get data from ArbeitNow API. URL: {response.url}. "
+                f"Status code: {response.status_code}, Reason: {response.reason}"
+            )
+            LOGGER.error(error_msg)
+            return error_msg
 
+        data = {"results": []}
         params = {}
         if visa_sponsorship:
             params["visa_sponsorship"] = visa_sponsorship
@@ -62,13 +65,10 @@ class ArbeitNow:
         pages = PAGES_MAX
         params["page"] = pages
         response = requests.get(API_URL, params=params)
+
         if response.status_code != 200:
-            # TODO: clean logging
-            error_msg = (
-                f"Status code: {response.status_code}, Reason: {response.reason}"
-            )
-            LOGGER.error(error_msg)
-            return error_msg + "There was an error please display something to the user"
+            return log_and_return_error(response)
+
         json_data: dict = response.json()
         number_offers = json_data["meta"]["to"]
 
@@ -78,16 +78,8 @@ class ArbeitNow:
             params["page"] = pages
             response = requests.get(API_URL, params=params)
             if response.status_code != 200:
-                # TODO: clean logging
-                error_msg = (
-                    f"Status code: {response.status_code}, Reason: {response.reason}"
-                )
-                LOGGER.error(error_msg)
-                return (
-                    error_msg
-                    + "There was an error please display something to the user"
-                )
-            json_data: dict = response.json()
+                return log_and_return_error(response)
+            json_data = response.json()
             number_offers = json_data["meta"]["to"]
 
         # FIND page WITHOUT results
@@ -96,49 +88,30 @@ class ArbeitNow:
             params["page"] = pages
             response = requests.get(API_URL, params=params)
             if response.status_code != 200:
-                # TODO: clean logging
-                error_msg = (
-                    f"Status code: {response.status_code}, Reason: {response.reason}"
-                )
-                LOGGER.error(error_msg)
-                return (
-                    error_msg
-                    + "There was an error please display something to the user"
-                )
-            json_data: dict = response.json()
+                return log_and_return_error(response)
+            json_data = response.json()
             number_offers = json_data["meta"]["to"]
 
         # The last page is the one before
         pages -= 1
         params["page"] = pages
         response = requests.get(API_URL, params=params)
-        json_data: dict = response.json()
+        json_data = response.json()
         number_offers = json_data["meta"]["to"]
         data["number_offers"] = number_offers
 
         for i in range(pages):
             params["page"] = i
             response = requests.get(API_URL, params=params)
-
             if response.status_code != 200:
-                # TODO: clean logging
-                error_msg = (
-                    f"Status code: {response.status_code}, Reason: {response.reason}"
-                )
-                LOGGER.error(error_msg)
-                return (
-                    error_msg
-                    + "There was an error please display something to the user"
-                )
-
-            json_data: dict = response.json()
-            results: dict[dict] = json_data["data"]
+                return log_and_return_error(response)
+            json_data = response.json()
+            results: dict = json_data["data"]
 
             for result in results:
                 date_posted = datetime.fromtimestamp(result["created_at"]).strftime(
                     "%Y-%m-%d %H:%M:%S"
                 )
-
                 job_info = {
                     "title": result["title"],
                     "remote": result["remote"],

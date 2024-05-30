@@ -136,7 +136,12 @@ def get_top_companies(request: HttpRequest):
 @api_view(["POST"])
 def get_jobs_arbeit_now(request: HttpRequest):
     """
-    TODO
+    Handle job search requests by querying the ArbeitNow job provider and returning the results.
+
+    This endpoint processes the following request parameters:
+    - visa_sponsorship (optional): Filters jobs based on visa sponsorship availability.
+
+    Returns a JSON response containing job offers from the ArbeitNow job provider.
     """
     parameters: dict = json.loads(request.body)
     visa_sponsorship = parameters.get("visa_sponsorship")
@@ -144,13 +149,12 @@ def get_jobs_arbeit_now(request: HttpRequest):
     GOOGLE_DRIVE_MANAGER = GoogleDriveManager()
     job_statistics_manager = JobStatisticsManager(GOOGLE_DRIVE_MANAGER, ARBEIT_NOW)
 
-    jobs_offers = {}
     arbeit_now = ArbeitNow(job_statistics_manager)
-
     arbeit_now_job_offers = arbeit_now.get_jobs(visa_sponsorship)
-    jobs_offers[ARBEIT_NOW] = arbeit_now_job_offers
+    
+    jobs_offers = {ARBEIT_NOW: arbeit_now_job_offers}
 
-    return JsonResponse({"offers": arbeit_now_job_offers}, status=status.HTTP_200_OK)
+    return JsonResponse({"offers": jobs_offers}, status=status.HTTP_200_OK)
 
 
 @api_view(["POST"])
