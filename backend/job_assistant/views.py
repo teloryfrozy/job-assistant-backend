@@ -159,8 +159,6 @@ def get_jobs(request: HttpRequest):
     """
     parameters: dict = json.loads(request.body)
 
-    # TODO: review all jobs providers docs and add ALL possible params
-
     job_title: str = parameters["job_title"]
     jobs_providers: list = parameters["jobs_providers"]
     levels: list = parameters.get("level")
@@ -188,6 +186,7 @@ def get_jobs(request: HttpRequest):
     job_statistics_manager = JobStatisticsManager(GOOGLE_DRIVE_MANAGER, ADZUNA)
 
     # TODO: USE functions to split the code
+    # TODO: use thread to increase speed
     ####################################################
     if ADZUNA in jobs_providers:
         job_statistics_manager.api_name = ADZUNA
@@ -214,6 +213,10 @@ def get_jobs(request: HttpRequest):
         adzuna_job_offers = adzuna.get_jobs(country, params)
         if isinstance(adzuna_job_offers, dict):
             jobs_offers[ADZUNA] = adzuna_job_offers
+        else:
+            LOGGER.error(
+                f"Failed to fetch jobs data from Adzuna API: {adzuna_job_offers}"
+            )
 
     ####################################################
     if FINDWORK in jobs_providers:
@@ -241,6 +244,10 @@ def get_jobs(request: HttpRequest):
         find_work_job_offers = find_work.get_jobs(params)
         if isinstance(find_work_job_offers, dict):
             jobs_offers[FINDWORK] = find_work_job_offers
+        else:
+            LOGGER.error(
+                f"Failed to fetch jobs data from FindWork API: {find_work_job_offers}"
+            )
     ####################################################
     if REED_CO_UK in jobs_providers:
         job_statistics_manager.api_name = REED_CO_UK
@@ -269,6 +276,10 @@ def get_jobs(request: HttpRequest):
         reed_co_uk_job_offers = reed_co_uk.get_jobs(params)
         if isinstance(reed_co_uk_job_offers, dict):
             jobs_offers[REED_CO_UK] = reed_co_uk_job_offers
+        else:
+            LOGGER.error(
+                f"Failed to fetch jobs data from Reed Co UK API: {reed_co_uk_job_offers}"
+            )
     ####################################################
     if THE_MUSE in jobs_providers:
         job_statistics_manager.api_name = THE_MUSE
@@ -284,5 +295,9 @@ def get_jobs(request: HttpRequest):
         the_muse_job_offers = the_muse.get_jobs(params)
         if isinstance(the_muse_job_offers, dict):
             jobs_offers[THE_MUSE] = the_muse_job_offers
+        else:
+            LOGGER.error(
+                f"Failed to fetch jobs data from The Muse API: {the_muse_job_offers}"
+            )
     ####################################################
     return JsonResponse({"offers": jobs_offers}, status=status.HTTP_200_OK)
