@@ -32,3 +32,4 @@ urllib3
 django-crontab
 colorama
 pypdf
+tiktoken

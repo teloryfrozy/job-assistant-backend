@@ -69,7 +69,8 @@ class TheMuse:
         if response.status_code == 200:
             data = response.json()
             number_offers = data["count"]
-            self.job_statistics_manager.store_number_offers(job_title, number_offers)
+            self.job_statistics_manager.store_number_offers(
+                job_title, number_offers)
         else:
             LOGGER.error(
                 f"Failed to fetch data from The Muse API: {response.status_code} - {response.reason}"
@@ -78,10 +79,10 @@ class TheMuse:
     def get_jobs(self, params: dict) -> dict[str, list] | str:
         """
         TODO: clean doc as a senior backend python developer
-            
+
         TODO: clean logging with a function (see arbeitnow.py)
         """
-        
+
         data = {}
         params["page"] = 1
         response = requests.get(f"{API_URL}jobs", params=params)
@@ -91,7 +92,7 @@ class TheMuse:
                 f"Status code: {response.status_code}, Reason: {response.reason}"
             )
             LOGGER.error(error_msg)
-            return error_msg 
+            return error_msg
 
         json_data: dict = response.json()
         number_offers = json_data["total"] if json_data["results"] != [] else 0
@@ -124,7 +125,7 @@ class TheMuse:
                     LOGGER.error(error_msg)
                     return (
                         error_msg
-                        
+
                     )
 
                 json_data: dict = response.json()

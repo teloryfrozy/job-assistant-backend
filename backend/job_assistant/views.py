@@ -87,7 +87,6 @@ def analyze_cv(request: HttpRequest):
         LOGGER.info("Keywords extracted and saved from CV successfully")
         return JsonResponse(
             {
-                "message": "Keywords extracted and saved from CV successfully",
                 "extracted_data": user_data,
             },
             status=status.HTTP_200_OK,
@@ -148,7 +147,8 @@ def get_jobs_arbeit_now(request: HttpRequest):
     visa_sponsorship = parameters.get("visa_sponsorship")
 
     GOOGLE_DRIVE_MANAGER = GoogleDriveManager()
-    job_statistics_manager = JobStatisticsManager(GOOGLE_DRIVE_MANAGER, ARBEIT_NOW)
+    job_statistics_manager = JobStatisticsManager(
+        GOOGLE_DRIVE_MANAGER, ARBEIT_NOW)
 
     arbeit_now = ArbeitNow(job_statistics_manager)
     arbeit_now_job_offers = arbeit_now.get_jobs(visa_sponsorship)
@@ -328,7 +328,8 @@ def get_jobs(request: HttpRequest):
                     reed_params["locationName"] += f", {city}"
             elif city:
                 reed_params["locationName"] = city
-        reed_thread = threading.Thread(target=fetch_reed_jobs, args=(reed_params,))
+        reed_thread = threading.Thread(
+            target=fetch_reed_jobs, args=(reed_params,))
         threads.append(reed_thread)
 
     ####################################################
@@ -339,7 +340,8 @@ def get_jobs(request: HttpRequest):
             "category": categories,
             "location": location_list,
         }
-        muse_thread = threading.Thread(target=fetch_the_muse_jobs, args=(muse_params,))
+        muse_thread = threading.Thread(
+            target=fetch_the_muse_jobs, args=(muse_params,))
         threads.append(muse_thread)
 
     for thread in threads:
