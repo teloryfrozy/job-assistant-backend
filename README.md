@@ -9,6 +9,7 @@
 # JobAssistant
 
 🔍 Job searching automated with AI | 🎯 Applying to jobs simplified
+⚠️ Disclaimer: This project is no longer maintained. I created an API to normalize results from job posting APIs for statistical analysis. I connected it to Google Drive instead of hosting a database on a VPS, as I wanted to avoid additional costs. Feel free to use this project for inspiration, and you're welcome to submit pull requests to the repository.
 
 ## Table of Contents
 
@@ -52,7 +53,7 @@ JobAssistant is a powerful tool designed to automate the job search process usin
 Replace `branchName` with the branch you want to clone (e.g., `main`):
 
 ```bash
-git clone -b branchName https://your_pseudo:token@github.com/Zapony/JobAssistant
+git clone -b main https://github.com/teloryfrozy/job-assistant-backend
 ```
 
 ## 🐋 Grant Execution Permissions and Start the Docker Container
