@@ -76,6 +76,36 @@ This module extracts information from a PDF resume and utilizes a language model
 
 **Usage:**
 
+## Setup credentials in a .env file at the root of the project
+```bash
+STATS_SALARIES_FILE_ID=""
+STATS_NUMBER_OFFERS_FILE_ID=""
+
+# JOB API KEYS
+ADZUNA_SECRET_KEY=""
+ADZUNA_APP_ID=""
+REED_CO_UK_SECRET_KEY=""
+FINDWORK_SECRET_KEY=""
+
+# LLM API KEYS
+AWANLLM_SECRET_KEY=""
+
+DJANGO_SECRET_KEY = "django-insecure-u3uh8!@75!(v%p$+z%2%5--7uzc(+&e@wo=agw1io74#m)4%id"
+
+# GOOGLE DRIVE SERVICE CREDS
+GDRIVE_TYPE = "service_account"
+GDRIVE_PROJECT_ID = ""
+GDRIVE_PRIVATE_KEY_ID = ""
+GDRIVE_PRIVATE_KEY = ""
+GDRIVE_CLIENT_EMAIL = ""
+GDRIVE_CLIENT_ID = ""
+GDRIVE_AUTH_URI = "https://accounts.google.com/o/oauth2/auth"
+GDRIVE_TOKEN_URI = "https://oauth2.googleapis.com/token"
+GDRIVE_AUTH_PROVIDER_X509_CERT_URL = "https://www.googleapis.com/oauth2/v1/certs"
+GDRIVE_CLIENT_X509_CERT_URL = ""
+GDRIVE_UNIVERSE_DOMAIN = "googleapis.com"
+```
+
 1. Extract text from a PDF resume using `extract_keywords`.
 2. Summarize the resume to identify relevant skills and experiences using `summarize_resume`.
 3. Utilize the extracted data to assess the closeness of a job to the user's profile.
